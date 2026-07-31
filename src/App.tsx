@@ -3,7 +3,7 @@ import scenarioJson from './data/scenarios/cafe-order-01.json'
 import tipsJson from './data/pronunciation/tips.json'
 import type { Progress, Rating, Scenario, TipLibrary, Turn } from './types'
 import { AudioEngine } from './audio/player'
-import { AudioSource } from './audio/source'
+import { AudioSource, WordAudio } from './audio/source'
 import { Recorder } from './audio/recorder'
 import { loadProgress, getTurnProgress, recordAttempt, recordRating } from './store/progress'
 import { purgeExpired } from './store/recordings'
@@ -20,6 +20,7 @@ type Tab = 'session' | 'dialogue'
 export default function App() {
   const engine = useMemo(() => new AudioEngine(), [])
   const source = useMemo(() => new AudioSource(engine, scenario), [engine])
+  const words = useMemo(() => new WordAudio(engine), [engine])
   const recorder = useMemo(() => new Recorder(), [])
   const appearances = useMemo(() => firstAppearances(scenario), [])
 
@@ -29,7 +30,7 @@ export default function App() {
   const progressRef = useRef(progress)
 
   const [tab, setTab] = useState<Tab>('session')
-  const [usingFallback, setUsingFallback] = useState(false)
+  const [audioMissing, setAudioMissing] = useState(false)
 
   /**
    * 전체 대화에서 펼쳐둔 문장과 그 단계.
@@ -56,7 +57,7 @@ export default function App() {
     }
   }, [engine, recorder])
 
-  const handleFallback = useCallback(() => setUsingFallback(true), [])
+  const handleAudioMissing = useCallback(() => setAudioMissing(true), [])
 
   const handleRate = useCallback((turn: Turn, rating: Rating): ScheduleResult => {
     const { progress: next, result } = recordRating(
@@ -95,8 +96,9 @@ export default function App() {
     library,
     engine,
     source,
+    words,
     recorder,
-    onFallbackDetected: handleFallback,
+    onAudioMissing: handleAudioMissing,
   }
 
   return (
@@ -128,14 +130,13 @@ export default function App() {
         </button>
       </nav>
 
-      {usingFallback && (
+      {audioMissing && (
         <div className="banner">
-          <strong>임시 음성으로 재생 중입니다.</strong>
+          <strong>음성 파일이 없습니다.</strong>
           <span>
-            Piper 음성 파일이 아직 없어 브라우저 내장 TTS로 읽고 있습니다. 특히
-            <strong> 키워드만 보고</strong> 단계는 소리에만 의존하므로 실제 음성이 필요합니다.
-            터미널에서 <code>npm run audio:setup</code> 후 <code>npm run audio:build</code>를
-            실행하세요.
+            이 앱은 기기 내장 TTS를 쓰지 않습니다. 목소리가 기기마다 달라지면 학습 기준이
+            흔들리기 때문입니다. 터미널에서 <code>npm run audio:setup</code> 후{' '}
+            <code>npm run audio:build</code>를 실행해 Piper 음성을 만들어주세요.
           </span>
         </div>
       )}

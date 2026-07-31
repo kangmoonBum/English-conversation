@@ -10,7 +10,7 @@ import type {
 } from '../types'
 import type { AudioEngine } from '../audio/player'
 import { playAba, sleep } from '../audio/player'
-import type { AudioSource } from '../audio/source'
+import type { AudioSource, WordAudio } from '../audio/source'
 import { MicPermissionError, Recorder } from '../audio/recorder'
 import { loadRecording, saveRecording } from '../store/recordings'
 import type { ScheduleResult } from '../srs'
@@ -35,12 +35,13 @@ interface Props {
   library: TipLibrary
   engine: AudioEngine
   source: AudioSource
+  words: WordAudio
   recorder: Recorder
   firstAppearing: Set<string>
   progress?: TurnProgress
   onRate: (rating: Rating) => ScheduleResult
   onAttempt: () => void
-  onFallbackDetected: () => void
+  onAudioMissing: () => void
 }
 
 /**
@@ -57,12 +58,13 @@ export function PracticePanel({
   library,
   engine,
   source,
+  words,
   recorder,
   firstAppearing,
   progress,
   onRate,
   onAttempt,
-  onFallbackDetected,
+  onAudioMissing,
 }: Props) {
   const [status, setStatus] = useState<Status>('idle')
   const [original, setOriginal] = useState<AudioBuffer | null>(null)
@@ -97,7 +99,7 @@ export function PracticePanel({
       const buffer = await source.buffer(turn, 'normal')
       if (cancelled) return
       setOriginal(buffer)
-      if (source.usingFallback) onFallbackDetected()
+      if (source.hasMissingAudio) onAudioMissing()
 
       const saved = await loadRecording(scenario.id, turn.id)
       if (cancelled || !saved) return
@@ -111,7 +113,7 @@ export function PracticePanel({
     return () => {
       cancelled = true
     }
-  }, [scenario.id, turn, source, engine, onFallbackDetected])
+  }, [scenario.id, turn, source, engine, onAudioMissing])
 
   const clearAutoStop = () => {
     if (autoStopTimer.current !== null) {
@@ -126,13 +128,16 @@ export function PracticePanel({
       setError(null)
       setStatus('playing')
       try {
-        await source.play(turn, speed)
-        if (source.usingFallback) onFallbackDetected()
+        const played = await source.play(turn, speed)
+        if (!played) {
+          onAudioMissing()
+          setError('이 문장의 음성 파일이 없습니다. `npm run audio:build`를 실행하세요.')
+        }
       } finally {
         setStatus('idle')
       }
     },
-    [source, turn, onFallbackDetected],
+    [source, turn, onAudioMissing],
   )
 
   const stopRecording = useCallback(async () => {
@@ -344,6 +349,7 @@ export function PracticePanel({
                 tip={library[ref.ref]}
                 defaultOpen={firstAppearing.has(ref.ref)}
                 highlighted={activeTip === ref.ref}
+                onPlayWord={(word) => words.play(word)}
               />
             ) : null,
           )}

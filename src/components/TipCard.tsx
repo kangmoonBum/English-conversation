@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import type { Tip, TipCategory } from '../types'
-import { speakWord } from '../audio/source'
 
 const CATEGORY_LABEL: Record<TipCategory, string> = {
   consonant: '자음',
@@ -19,6 +18,8 @@ interface Props {
   /** 처음 등장하는 팁은 펼쳐서 보여준다. 이후에는 접어 소음을 줄인다. */
   defaultOpen?: boolean
   highlighted?: boolean
+  /** 최소 대립쌍 단어를 재생한다. 파일이 없으면 false를 돌려준다. */
+  onPlayWord: (word: string) => Promise<boolean>
 }
 
 /**
@@ -28,8 +29,21 @@ interface Props {
  * 학습자가 몸으로 확인할 수 있는 물리적 검증 방법이라, 점수 없이도
  * 맞게 하고 있는지 스스로 판단할 수 있다. 그래서 시각적으로 가장 강조한다.
  */
-export function TipCard({ id, tip, defaultOpen = false, highlighted = false }: Props) {
+export function TipCard({
+  id,
+  tip,
+  defaultOpen = false,
+  highlighted = false,
+  onPlayWord,
+}: Props) {
   const [open, setOpen] = useState(defaultOpen)
+  /** 파일이 없어 재생하지 못한 단어. 버튼을 비활성해 헛클릭을 막는다. */
+  const [unavailable, setUnavailable] = useState<Set<string>>(new Set())
+
+  const playWord = async (word: string) => {
+    if (await onPlayWord(word)) return
+    setUnavailable((prev) => new Set(prev).add(word))
+  }
 
   return (
     <div
@@ -75,13 +89,19 @@ export function TipCard({ id, tip, defaultOpen = false, highlighted = false }: P
               <div className="pairs">
                 {tip.minimalPairs.map((pair, i) => (
                   <div className="pair" key={i}>
-                    <button type="button" onClick={() => void speakWord(pair[0])}>
-                      🔊 {pair[0]}
-                    </button>
-                    <span className="pair-vs">vs</span>
-                    <button type="button" onClick={() => void speakWord(pair[1])}>
-                      🔊 {pair[1]}
-                    </button>
+                    {pair.map((word, j) => (
+                      <span key={j} className="pair-item">
+                        {j === 1 && <span className="pair-vs">vs</span>}
+                        <button
+                          type="button"
+                          disabled={unavailable.has(word)}
+                          title={unavailable.has(word) ? '음성 파일이 없습니다' : undefined}
+                          onClick={() => void playWord(word)}
+                        >
+                          🔊 {word}
+                        </button>
+                      </span>
+                    ))}
                   </div>
                 ))}
               </div>

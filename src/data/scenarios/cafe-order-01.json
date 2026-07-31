@@ -8,8 +8,8 @@
   },
   "userRole": "B",
   "voices": {
-    "A": "en_US-amy-medium",
-    "B": "en_US-lessac-medium"
+    "A": "en-us-lessac-medium",
+    "B": "en-us-ryan-high"
   },
   "turns": [
     {

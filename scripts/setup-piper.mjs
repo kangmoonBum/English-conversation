@@ -8,31 +8,50 @@
  *
  * 사용: npm run audio:setup
  */
-import { mkdirSync, existsSync, statSync } from 'node:fs'
+import { mkdirSync, existsSync, statSync, createWriteStream, rmSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { spawnSync } from 'node:child_process'
 import { pipeline } from 'node:stream/promises'
-import { createWriteStream } from 'node:fs'
 import { Readable } from 'node:stream'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const VOICES_DIR = join(ROOT, 'voices')
 
 /**
- * 시나리오에서 쓰는 음성. 역할마다 다른 목소리를 써서 화자를 구분한다.
- * 시나리오 JSON의 `voices` 값과 이름이 일치해야 한다.
+ * 쓰는 음성.
+ *
+ * 둘 다 단일 화자 전문 녹음이라 "정제된 낭독" 음색이 나온다.
+ * 다화자 모델(libritts 등)은 화자마다 품질 편차가 커서 쓰지 않는다.
+ *
+ *   lessac  Lessac Technologies의 상용 TTS용 스튜디오 녹음. 중립적이고 깨끗하다.
+ *   ryan    오디오북 낭독 데이터. high 품질이라 자연스러움이 한 단계 위다.
+ *
+ * 바꾸고 싶으면 여기와 시나리오 JSON의 `voices`를 함께 고치면 된다.
+ * v0.0.2 릴리스에서 받을 수 있는 다른 영어 음성:
+ *   en-us-ryan-medium, en-us-ryan-low, en-us-amy-low, en-us-kathleen-low
  */
-const VOICES = [
-  { name: 'en_US-lessac-medium', path: 'en/en_US/lessac/medium' },
-  { name: 'en_US-amy-medium', path: 'en/en_US/amy/medium' },
-]
+const VOICES = ['en-us-lessac-medium', 'en-us-ryan-high']
 
+/**
+ * 음성 모델 배포처.
+ *
+ * 현재 공식 배포처는 HuggingFace지만, 사내망 등에서 차단되는 경우가 많다.
+ * Piper 초기 릴리스가 GitHub에 같은 모델을 올려두었고 그쪽이 훨씬 잘 뚫리므로
+ * GitHub을 먼저 시도하고 실패하면 HuggingFace로 넘어간다.
+ */
+const GITHUB_BASE = 'https://github.com/rhasspy/piper/releases/download/v0.0.2'
 const HF_BASE = 'https://huggingface.co/rhasspy/piper-voices/resolve/main'
 
-function run(cmd, args, opts = {}) {
-  return spawnSync(cmd, args, { encoding: 'utf8', ...opts })
+/** HuggingFace는 경로 구조가 달라서 이름을 변환해야 한다. */
+function hfPath(voice) {
+  // en-us-ryan-high → en/en_US/ryan/high, en_US-ryan-high
+  const m = voice.match(/^en-us-(.+)-(low|medium|high)$/)
+  if (!m) return null
+  return { dir: `en/en_US/${m[1]}/${m[2]}`, name: `en_US-${m[1]}-${m[2]}` }
 }
+
+const run = (cmd, args, opts = {}) => spawnSync(cmd, args, { encoding: 'utf8', ...opts })
 
 function pythonCmd() {
   for (const cmd of ['python3', 'python']) {
@@ -43,12 +62,33 @@ function pythonCmd() {
 
 async function download(url, dest) {
   const res = await fetch(url, { redirect: 'follow' })
-  if (!res.ok || !res.body) {
-    throw new Error(`HTTP ${res.status} — ${url}`)
-  }
-  mkdirSync(dirname(dest), { recursive: true })
+  if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`)
   await pipeline(Readable.fromWeb(res.body), createWriteStream(dest))
 }
+
+/** GitHub 릴리스는 tar.gz로 묶여 있다. 풀면 <voice>.onnx 와 .onnx.json 이 나온다. */
+async function fromGithub(voice) {
+  const tgz = join(VOICES_DIR, `${voice}.tar.gz`)
+  await download(`${GITHUB_BASE}/voice-${voice}.tar.gz`, tgz)
+  const tar = run('tar', ['xzf', tgz, '-C', VOICES_DIR])
+  rmSync(tgz, { force: true })
+  rmSync(join(VOICES_DIR, 'MODEL_CARD'), { force: true })
+  if (tar.status !== 0) throw new Error(`압축 해제 실패: ${tar.stderr ?? ''}`)
+}
+
+/** HuggingFace는 파일을 따로 받고 이름이 en_US-... 형태라 우리 규칙으로 바꿔 저장한다. */
+async function fromHuggingFace(voice) {
+  const hf = hfPath(voice)
+  if (!hf) throw new Error('HuggingFace 경로를 알 수 없는 음성입니다')
+  for (const ext of ['.onnx', '.onnx.json']) {
+    await download(`${HF_BASE}/${hf.dir}/${hf.name}${ext}?download=true`, join(VOICES_DIR, `${voice}${ext}`))
+  }
+}
+
+const haveVoice = (voice) =>
+  existsSync(join(VOICES_DIR, `${voice}.onnx`)) &&
+  statSync(join(VOICES_DIR, `${voice}.onnx`)).size > 1024 * 1024 &&
+  existsSync(join(VOICES_DIR, `${voice}.onnx.json`))
 
 async function main() {
   console.log('Piper TTS 셋업을 시작합니다.\n')
@@ -60,18 +100,15 @@ async function main() {
     process.exit(1)
   }
 
-  const installed = run(python, ['-c', 'import piper']).status === 0
-  if (installed) {
+  if (run(python, ['-c', 'import piper']).status === 0) {
     console.log('✓ piper-tts가 이미 설치되어 있습니다.')
   } else {
     console.log('· piper-tts를 설치합니다 (pip install piper-tts)...')
-    const pip = run(python, ['-m', 'pip', 'install', '--quiet', 'piper-tts'], {
-      stdio: 'inherit',
-    })
+    const pip = run(python, ['-m', 'pip', 'install', '--quiet', 'piper-tts'], { stdio: 'inherit' })
     if (pip.status !== 0) {
       console.error(
         '\n✖ piper-tts 설치에 실패했습니다.\n' +
-        '  가상환경을 쓰고 있다면 활성화한 뒤 다시 시도하거나, 직접 설치하세요:\n' +
+        '  가상환경을 쓰고 있다면 활성화한 뒤 다시 시도하거나 직접 설치하세요:\n' +
         `    ${python} -m pip install piper-tts\n`,
       )
       process.exit(1)
@@ -79,35 +116,45 @@ async function main() {
     console.log('✓ piper-tts 설치 완료')
   }
 
-  // ---------- 2. 음성 모델 내려받기 ----------
+  // ---------- 2. 음성 모델 ----------
   mkdirSync(VOICES_DIR, { recursive: true })
 
   for (const voice of VOICES) {
-    for (const ext of ['.onnx', '.onnx.json']) {
-      const file = `${voice.name}${ext}`
-      const dest = join(VOICES_DIR, file)
+    if (haveVoice(voice)) {
+      console.log(`✓ ${voice} (이미 있음)`)
+      continue
+    }
 
-      // .onnx는 수십 MB라 크기까지 확인해야 중간에 끊긴 파일을 걸러낼 수 있다.
-      if (existsSync(dest) && statSync(dest).size > 1024) {
-        console.log(`✓ ${file} (이미 있음)`)
-        continue
-      }
+    const failures = []
+    let ok = false
 
-      const url = `${HF_BASE}/${voice.path}/${file}?download=true`
-      console.log(`· ${file} 내려받는 중...`)
+    for (const [label, fetcher] of [
+      ['GitHub', fromGithub],
+      ['HuggingFace', fromHuggingFace],
+    ]) {
+      process.stdout.write(`· ${voice} — ${label}에서 내려받는 중... `)
       try {
-        await download(url, dest)
-        console.log(`✓ ${file}`)
+        await fetcher(voice)
+        if (!haveVoice(voice)) throw new Error('받은 파일이 올바르지 않습니다')
+        console.log('완료')
+        ok = true
+        break
       } catch (e) {
-        console.error(
-          `\n✖ ${file} 내려받기 실패 — ${e.message}\n\n` +
-          '  네트워크에서 huggingface.co가 차단되어 있을 수 있습니다.\n' +
-          '  브라우저로 아래 주소에서 직접 받아 voices/ 폴더에 넣어주세요:\n' +
-          `    ${HF_BASE}/${voice.path}/${file}\n\n` +
-          '  (.onnx 와 .onnx.json 두 파일이 모두 필요합니다.)\n',
-        )
-        process.exit(1)
+        console.log('실패')
+        failures.push(`${label}: ${e.message}`)
       }
+    }
+
+    if (!ok) {
+      console.error(
+        `\n✖ ${voice} 를 받지 못했습니다.\n` +
+        failures.map((f) => `    ${f}`).join('\n') +
+        '\n\n  네트워크에서 두 곳 모두 차단된 것 같습니다.\n' +
+        '  브라우저로 아래 파일을 받아 voices/ 폴더에 넣어주세요:\n' +
+        `    ${GITHUB_BASE}/voice-${voice}.tar.gz\n` +
+        `  (압축을 풀면 ${voice}.onnx 와 ${voice}.onnx.json 이 나옵니다.)\n`,
+      )
+      process.exit(1)
     }
   }
 

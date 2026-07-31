@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { Rating, Scenario, TipLibrary, Turn, TurnProgress } from '../types'
 import type { AudioEngine } from '../audio/player'
-import type { AudioSource } from '../audio/source'
+import type { AudioSource, WordAudio } from '../audio/source'
 import type { Recorder } from '../audio/recorder'
 import type { QueueItem, ScheduleResult } from '../srs'
 import { LEVEL_LABEL } from '../srs'
@@ -13,12 +13,13 @@ interface Props {
   library: TipLibrary
   engine: AudioEngine
   source: AudioSource
+  words: WordAudio
   recorder: Recorder
   appearances: Map<number, Set<string>>
   progressOf: (turnId: number) => TurnProgress | undefined
   onRate: (turn: Turn, rating: Rating) => ScheduleResult
   onAttempt: (turnId: number) => void
-  onFallbackDetected: () => void
+  onAudioMissing: () => void
   onRestart: () => void
 }
 

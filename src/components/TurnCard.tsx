@@ -7,7 +7,7 @@ import type {
   TurnProgress,
 } from '../types'
 import type { AudioEngine } from '../audio/player'
-import type { AudioSource } from '../audio/source'
+import type { AudioSource, WordAudio } from '../audio/source'
 import type { Recorder } from '../audio/recorder'
 import type { ScheduleResult } from '../srs'
 import { LEVEL_LABEL } from '../srs'
@@ -22,6 +22,7 @@ interface Props {
   library: TipLibrary
   engine: AudioEngine
   source: AudioSource
+  words: WordAudio
   recorder: Recorder
   firstAppearing: Set<string>
   isActive: boolean
@@ -29,7 +30,7 @@ interface Props {
   progress?: TurnProgress
   onRate: (rating: Rating) => ScheduleResult
   onAttempt: () => void
-  onFallbackDetected: () => void
+  onAudioMissing: () => void
 }
 
 /** 대화 목록의 한 줄. 접혀 있으면 미리보기, 펼치면 연습 화면을 띄운다. */
