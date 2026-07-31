@@ -1,0 +1,186 @@
+{
+  "id": "cafe-order-01",
+  "title": "카페에서 주문하기",
+  "level": "A2",
+  "roles": {
+    "A": "Barista",
+    "B": "Customer"
+  },
+  "userRole": "B",
+  "voices": {
+    "A": "en_US-amy-medium",
+    "B": "en_US-lessac-medium"
+  },
+  "turns": [
+    {
+      "id": 1,
+      "role": "A",
+      "text": "Hi there! What can I get started for you today?",
+      "ko": "안녕하세요! 오늘 뭐 드릴까요?",
+      "audio": { "normal": "01.mp3", "slow": "01_slow.mp3" },
+      "keywords": ["what can I get", "for you today"],
+      "tips": [
+        { "ref": "linking-cv", "target": "can I get" },
+        { "ref": "flap-t", "target": "started" },
+        { "ref": "question-intonation", "target": "What can I get started for you today?" }
+      ],
+      "coach": "카페에서 가장 자주 듣는 첫마디입니다. 'What can I'가 [워러나이]처럼 뭉쳐서 들리기 때문에, 통째로 한 덩어리로 기억해두면 실전에서 당황하지 않습니다."
+    },
+    {
+      "id": 2,
+      "role": "B",
+      "text": "Could I get a large iced americano, please?",
+      "ko": "아이스 아메리카노 라지 하나 주세요.",
+      "audio": { "normal": "02.mp3", "slow": "02_slow.mp3" },
+      "keywords": ["Could I get", "large", "iced americano"],
+      "intentKo": "아이스 아메리카노 큰 사이즈를 정중하게 주문해라",
+      "alternatives": [
+        "Can I have a large iced americano?",
+        "I'll take a large iced americano, please.",
+        "Could I have a large iced americano?"
+      ],
+      "tips": [
+        { "ref": "linking-cv", "target": "Could I get a" },
+        { "ref": "final-stop", "target": "iced" },
+        { "ref": "l-clear", "target": "large" }
+      ],
+      "coach": "'I want ~'은 아이가 조르는 느낌이라 주문에 잘 쓰지 않습니다. 'Could I get ~'이 가장 무난합니다. 'Could I get a'는 네 단어지만 [쿠라이게러]처럼 한 덩어리로 뭉쳐야 자연스럽습니다."
+    },
+    {
+      "id": 3,
+      "role": "A",
+      "text": "Sure. Would you like room for cream?",
+      "ko": "네. 크림 넣을 공간 남겨 드릴까요?",
+      "audio": { "normal": "03.mp3", "slow": "03_slow.mp3" },
+      "keywords": ["room for cream"],
+      "tips": [
+        { "ref": "r-initial", "target": "room" },
+        { "ref": "consonant-cluster", "target": "cream" },
+        { "ref": "question-intonation", "target": "Would you like room for cream?" }
+      ],
+      "coach": "'room for cream'은 커피 위에 크림이나 우유를 넣을 자리를 남겨둘지 묻는 표현입니다. 한국 카페에는 없는 질문이라 처음 들으면 당황하기 쉬운데, 미국 카페에서는 거의 매번 나옵니다."
+    },
+    {
+      "id": 4,
+      "role": "B",
+      "text": "No room, thanks. Just fill it up.",
+      "ko": "아니요, 가득 채워주세요.",
+      "audio": { "normal": "04.mp3", "slow": "04_slow.mp3" },
+      "keywords": ["No room", "fill it up"],
+      "intentKo": "공간 남기지 말고 가득 채워달라고 말해라",
+      "alternatives": [
+        "No room, please. Fill it all the way up.",
+        "All the way, please.",
+        "No thanks, just fill it to the top."
+      ],
+      "tips": [
+        { "ref": "r-initial", "target": "room" },
+        { "ref": "th-voiceless", "target": "thanks" },
+        { "ref": "linking-cv", "target": "fill it up" }
+      ],
+      "coach": "'fill it up'은 세 단어를 [필리럽]처럼 완전히 붙여서 말합니다. 중간의 t는 모음 사이라 'ㄹ'로 바뀝니다. 반대로 공간을 남겨달라면 'Yes, please leave some room.'이라고 하면 됩니다."
+    },
+    {
+      "id": 5,
+      "role": "A",
+      "text": "Got it. Anything else with that?",
+      "ko": "알겠습니다. 그 외에 더 필요하신 건요?",
+      "audio": { "normal": "05.mp3", "slow": "05_slow.mp3" },
+      "keywords": ["Got it", "Anything else"],
+      "tips": [
+        { "ref": "flap-t", "target": "Got it" },
+        { "ref": "th-voiceless", "target": "Anything" },
+        { "ref": "th-voiced", "target": "that" }
+      ],
+      "coach": "'Got it'은 [가릿] 한 덩어리로 들립니다. 같은 문장 안에 무성 TH(Anything)와 유성 TH(that)가 같이 나오니, 목에 손을 대고 둘의 차이를 확인하기 좋은 문장입니다."
+    },
+    {
+      "id": 6,
+      "role": "B",
+      "text": "Actually, could I add a blueberry muffin?",
+      "ko": "아, 블루베리 머핀도 하나 추가할 수 있을까요?",
+      "audio": { "normal": "06.mp3", "slow": "06_slow.mp3" },
+      "keywords": ["Actually", "add a", "blueberry muffin"],
+      "intentKo": "생각난 김에 블루베리 머핀을 추가로 주문해라",
+      "alternatives": [
+        "Oh, and could I add a blueberry muffin?",
+        "Can I also get a blueberry muffin?",
+        "Actually, let me add a blueberry muffin too."
+      ],
+      "tips": [
+        { "ref": "flap-t", "target": "Actually" },
+        { "ref": "linking-cv", "target": "add a" },
+        { "ref": "consonant-cluster", "target": "blueberry" }
+      ],
+      "coach": "'Actually'는 말을 바꾸거나 뭔가 덧붙일 때 쓰는 완충 표현입니다. 없으면 갑작스럽게 들리니 습관으로 붙이세요. 발음은 [액츄얼리]보다 [액철리]에 가깝게 뭉갭니다."
+    },
+    {
+      "id": 7,
+      "role": "A",
+      "text": "Of course. Would you like it warmed up?",
+      "ko": "물론이죠. 데워 드릴까요?",
+      "audio": { "normal": "07.mp3", "slow": "07_slow.mp3" },
+      "keywords": ["warmed up"],
+      "tips": [
+        { "ref": "linking-cv", "target": "like it" },
+        { "ref": "final-ed", "target": "warmed" },
+        { "ref": "question-intonation", "target": "Would you like it warmed up?" }
+      ],
+      "coach": "'warmed up'은 [웜덥]처럼 두 단어가 붙습니다. warmed의 -ed는 음절을 늘리지 않으니 '웜드'가 아니라 한 박자로 끝내세요. Yes/No 질문이라 끝을 올립니다."
+    },
+    {
+      "id": 8,
+      "role": "B",
+      "text": "Yes, please. That'd be great.",
+      "ko": "네, 좋아요. 그렇게 해주시면 감사하죠.",
+      "audio": { "normal": "08.mp3", "slow": "08_slow.mp3" },
+      "keywords": ["Yes please", "That'd be great"],
+      "intentKo": "데워달라는 제안을 기분 좋게 수락해라",
+      "alternatives": [
+        "Yes, please. That would be great.",
+        "Sure, that'd be perfect.",
+        "Yes, if you don't mind."
+      ],
+      "tips": [
+        { "ref": "z-sound", "target": "Yes" },
+        { "ref": "th-voiced", "target": "That'd" },
+        { "ref": "final-stop", "target": "great" }
+      ],
+      "coach": "'That'd'는 That would의 축약형으로 [댓드]가 아니라 [댇]에 가깝게 뭉갭니다. 발음이 어려우면 'That would be great'으로 풀어 말해도 전혀 어색하지 않습니다."
+    },
+    {
+      "id": 9,
+      "role": "A",
+      "text": "Alright, that'll be nine forty-five. For here or to go?",
+      "ko": "네, 9달러 45센트입니다. 여기서 드시나요, 가져가시나요?",
+      "audio": { "normal": "09.mp3", "slow": "09_slow.mp3" },
+      "keywords": ["nine forty-five", "For here or to go"],
+      "tips": [
+        { "ref": "sentence-stress", "target": "that'll be" },
+        { "ref": "flap-t", "target": "forty" },
+        { "ref": "question-intonation", "target": "For here or to go?" }
+      ],
+      "coach": "'For here or to go?'는 선택 질문이라 앞은 올리고 뒤는 내립니다. 가격은 'nine forty-five'처럼 달러와 센트를 그냥 숫자로 이어서 말하는 게 보통입니다."
+    },
+    {
+      "id": 10,
+      "role": "B",
+      "text": "To go, please. Here's my card.",
+      "ko": "가져갈게요. 카드 여기 있습니다.",
+      "audio": { "normal": "10.mp3", "slow": "10_slow.mp3" },
+      "keywords": ["To go", "Here's my card"],
+      "intentKo": "포장이라고 답하고 카드를 건네라",
+      "alternatives": [
+        "To go, thanks. Here's my card.",
+        "I'll take it to go. Card, please.",
+        "To go. Can I pay by card?"
+      ],
+      "tips": [
+        { "ref": "schwa", "target": "To" },
+        { "ref": "z-sound", "target": "Here's" },
+        { "ref": "final-stop", "target": "card" }
+      ],
+      "coach": "'To go'의 To는 [투]가 아니라 힘을 뺀 [터]입니다. 여기서 To를 또박또박 발음하면 바로 외국인 티가 납니다. 매장에서 먹으면 'For here, please.'라고 하면 됩니다."
+    }
+  ]
+}

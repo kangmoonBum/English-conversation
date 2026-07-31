@@ -1,0 +1,29 @@
+{
+  "name": "shadowing-trainer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "영어 회화 섀도잉 트레이너 — 발음 유의점과 자가 검증 중심",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "validate": "node scripts/validate-scenarios.mjs",
+    "audio:setup": "node scripts/setup-piper.mjs",
+    "audio:build": "node scripts/generate-audio.mjs"
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7",
+    "vitest": "^2.1.8"
+  }
+}

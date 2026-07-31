@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.vite/
+*.tsbuildinfo
+
+# Piper 음성 모델 (용량이 커서 커밋하지 않음, audio:setup으로 각자 내려받음)
+voices/
+
+# 오디오 생성 중간 산출물
+*.wav.tmp
+.DS_Store

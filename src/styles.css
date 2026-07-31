@@ -1,0 +1,394 @@
+:root {
+  --bg: #0f1115;
+  --surface: #171a21;
+  --surface-2: #1e222b;
+  --border: #2a2f3a;
+  --text: #e6e8ec;
+  --text-dim: #9aa1ae;
+  --accent: #5b9dd9;
+  --mine: #e0a458;
+  --danger: #e06c6c;
+  --ok: #6fbf73;
+
+  --cat-consonant: #6ba4dd;
+  --cat-vowel: #c98bdb;
+  --cat-ending: #e0a458;
+  --cat-cluster: #dd8f6b;
+  --cat-rhythm: #6fbf9b;
+  --cat-linking: #7fb069;
+  --cat-reduction: #c9b458;
+  --cat-intonation: #d1789b;
+
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo',
+    'Noto Sans KR', Roboto, sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+code {
+  background: var(--surface-2);
+  padding: 0.1em 0.4em;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+.app {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 16px 64px;
+}
+
+.app-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.app-head h1 { margin: 0; font-size: 1.5rem; }
+.app-sub { margin: 4px 0 0; color: var(--text-dim); font-size: 0.875rem; }
+.app-progress {
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.banner {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: #2b2417;
+  border: 1px solid #4a3d21;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  font-size: 0.875rem;
+  color: #e8d5a8;
+}
+
+.tip-intro {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 20px;
+  font-size: 0.875rem;
+  color: var(--text-dim);
+}
+.tip-intro strong { color: var(--text); }
+
+/* ---------- 턴 ---------- */
+.turns { display: flex; flex-direction: column; gap: 10px; }
+
+.turn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  text-align: left;
+  width: 100%;
+}
+.turn-mine { border-left: 3px solid var(--mine); }
+
+.turn-collapsed {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--surface);
+}
+.turn-collapsed:hover { background: var(--surface-2); }
+
+.turn-open { padding: 16px; }
+
+.turn-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.turn-role {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+.turn-mine .turn-role { color: var(--mine); }
+
+.turn-preview {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9rem;
+  color: var(--text-dim);
+}
+.turn-rating { font-size: 1rem; }
+.turn-attempts { font-size: 0.75rem; color: var(--text-dim); }
+
+.sentence {
+  margin: 0 0 6px;
+  font-size: 1.25rem;
+  line-height: 1.7;
+  word-break: keep-all;
+}
+.sentence-ko {
+  margin: 0 0 14px;
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+
+.marked {
+  background: none;
+  border: none;
+  padding: 0;
+  border-bottom: 2px solid currentColor;
+  border-radius: 0;
+  font-size: inherit;
+  line-height: inherit;
+}
+.marked-consonant { color: var(--cat-consonant); }
+.marked-vowel { color: var(--cat-vowel); }
+.marked-ending { color: var(--cat-ending); }
+.marked-cluster { color: var(--cat-cluster); }
+.marked-rhythm { color: var(--cat-rhythm); }
+.marked-linking { color: var(--cat-linking); }
+.marked-reduction { color: var(--cat-reduction); }
+.marked-intonation { color: var(--cat-intonation); }
+.marked-active { background: rgba(255, 255, 255, 0.1); }
+
+/* ---------- 컨트롤 ---------- */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.controls button {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 0.875rem;
+}
+.controls button:not(:disabled):hover { border-color: var(--accent); }
+
+.btn-record { border-color: var(--danger) !important; color: #f0b0b0; }
+.btn-recording {
+  background: var(--danger) !important;
+  border-color: var(--danger) !important;
+  color: #fff;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+.btn-compare { border-color: var(--accent) !important; color: #bcd9f2; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.aba-now { font-size: 0.8rem; color: var(--accent); }
+
+.hint { font-size: 0.8rem; color: var(--text-dim); margin: 0 0 12px; }
+.hint-recording { color: #f0b0b0; }
+.error {
+  font-size: 0.85rem;
+  color: #f0b0b0;
+  background: #2b1a1a;
+  border: 1px solid #4a2626;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin: 0 0 12px;
+}
+
+/* ---------- 파형 ---------- */
+.waveforms {
+  background: var(--surface-2);
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+.wave-row { display: flex; align-items: center; gap: 10px; }
+.wave-row + .wave-row { margin-top: 6px; }
+.wave-label {
+  width: 52px;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  flex-shrink: 0;
+}
+.wave-canvas { flex: 1; height: 48px; min-width: 0; }
+.wave-duration {
+  width: 44px;
+  text-align: right;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+.wave-note {
+  margin: 10px 0 0;
+  font-size: 0.8rem;
+  color: var(--cat-rhythm);
+}
+
+/* ---------- 자기 평가 ---------- */
+.rating {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px;
+  background: var(--surface-2);
+  border-radius: 10px;
+  margin-bottom: 14px;
+}
+.rating-question { font-size: 0.85rem; color: var(--text-dim); }
+.rating-options { display: flex; gap: 8px; }
+.rating-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 12px;
+}
+.rating-btn-on { border-color: var(--ok); background: #1c2a1e; }
+.rating-emoji { font-size: 1.1rem; }
+.rating-label { font-size: 0.7rem; color: var(--text-dim); }
+
+/* ---------- 팁 ---------- */
+.tips { margin-top: 16px; }
+.tips h3, .coach h3 {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  margin: 0 0 8px;
+}
+.tips-note { font-size: 0.75rem; color: var(--text-dim); margin: 8px 0 0; }
+
+.tip {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--surface-2);
+}
+.tip + .tip { margin-top: 8px; }
+.tip-highlighted { border-color: var(--accent); }
+
+.tip-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 10px 12px;
+  text-align: left;
+}
+.tip-head:hover { background: rgba(255, 255, 255, 0.03); }
+
+.tip-badge {
+  font-size: 0.65rem;
+  padding: 2px 7px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.tip-badge-consonant { color: var(--cat-consonant); }
+.tip-badge-vowel { color: var(--cat-vowel); }
+.tip-badge-ending { color: var(--cat-ending); }
+.tip-badge-cluster { color: var(--cat-cluster); }
+.tip-badge-rhythm { color: var(--cat-rhythm); }
+.tip-badge-linking { color: var(--cat-linking); }
+.tip-badge-reduction { color: var(--cat-reduction); }
+.tip-badge-intonation { color: var(--cat-intonation); }
+
+.tip-symbol {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.tip-title { flex: 1; font-size: 0.9rem; }
+.tip-toggle { color: var(--text-dim); font-size: 1.1rem; flex-shrink: 0; }
+
+.tip-body { padding: 0 12px 12px; }
+.tip-section { margin-top: 12px; }
+.tip-section h4 {
+  margin: 0 0 4px;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  letter-spacing: 0.03em;
+}
+.tip-section p { margin: 0; font-size: 0.875rem; }
+.tip-section ol { margin: 0; padding-left: 20px; font-size: 0.875rem; }
+.tip-section li { margin-bottom: 3px; }
+
+/* 채점이 없는 만큼 자가 확인법이 가장 중요한 정보다. 시각적으로 강조한다. */
+.tip-selfcheck {
+  background: #1b2620;
+  border: 1px solid #2f4438;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.tip-selfcheck h4 { color: var(--ok); }
+
+.tip-hint { color: var(--text-dim) !important; font-size: 0.8rem !important; margin-bottom: 8px !important; }
+
+.pairs { display: flex; flex-direction: column; gap: 6px; }
+.pair { display: flex; align-items: center; gap: 8px; }
+.pair button {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+}
+.pair button:hover { border-color: var(--accent); }
+.pair-vs { font-size: 0.7rem; color: var(--text-dim); }
+
+/* ---------- 노하우 ---------- */
+.coach {
+  margin-top: 16px;
+  background: var(--surface-2);
+  border-left: 3px solid var(--cat-rhythm);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+.coach p { margin: 0; font-size: 0.875rem; }
+
+.app-foot {
+  margin-top: 32px;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .sentence { font-size: 1.1rem; }
+  .controls button { flex: 1 1 auto; }
+}
