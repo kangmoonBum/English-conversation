@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import scenarioJson from './data/scenarios/cafe-order-01.json'
 import tipsJson from './data/pronunciation/tips.json'
+import { SCENARIOS } from './data/scenarios'
 import type { Progress, Rating, Scenario, TipLibrary, Turn } from './types'
 import { AudioEngine } from './audio/player'
 import { AudioSource, WordAudio } from './audio/source'
@@ -12,17 +12,20 @@ import { buildQueue, levelFor, pendingCount, type QueueItem, type ScheduleResult
 import { TurnCard } from './components/TurnCard'
 import { SessionView } from './components/SessionView'
 
-const scenario = scenarioJson as unknown as Scenario
 const library = tipsJson as unknown as TipLibrary
 
 type Tab = 'session' | 'dialogue'
 
+/** 시나리오별 "이 팁이 처음 나오는 턴" 표. 팁 카드를 언제 펼칠지 정하는 데 쓴다. */
+const APPEARANCES = new Map(SCENARIOS.map((s) => [s.id, firstAppearances(s)]))
+const appearancesFor = (scenarioId: string, turnId: number) =>
+  APPEARANCES.get(scenarioId)?.get(turnId) ?? new Set<string>()
+
 export default function App() {
   const engine = useMemo(() => new AudioEngine(), [])
-  const source = useMemo(() => new AudioSource(engine, scenario), [engine])
+  const source = useMemo(() => new AudioSource(engine), [engine])
   const words = useMemo(() => new WordAudio(engine), [engine])
   const recorder = useMemo(() => new Recorder(), [])
-  const appearances = useMemo(() => firstAppearances(scenario), [])
 
   const initialProgress = useMemo(() => loadProgress(), [])
   const [progress, setProgress] = useState<Progress>(initialProgress)
@@ -32,21 +35,29 @@ export default function App() {
   const [tab, setTab] = useState<Tab>('session')
   const [audioMissing, setAudioMissing] = useState(false)
 
+  /** 전체 대화 탭에서 보고 있는 상황. */
+  const [scenarioId, setScenarioId] = useState(SCENARIOS[0].id)
+  const scenario = SCENARIOS.find((s) => s.id === scenarioId) ?? SCENARIOS[0]
+
   /**
-   * 전체 대화에서 펼쳐둔 문장과 그 단계.
+   * 펼쳐둔 문장과 그 단계.
    *
    * 단계를 여기 고정하는 것이 중요하다. 평가 직후 진행도가 바뀌는데, 화면이
    * 그걸 바로 반영하면 "내일 다시"라고 안내해놓고 눈앞에서 난이도가 바뀌어
    * 모순이 된다. 승급은 다음에 이 문장을 열 때부터 적용한다.
    */
   const [active, setActive] = useState(() => {
-    const first = scenario.turns[0]
-    return { id: first?.id ?? 1, level: levelFor(initialProgress, scenario.id, first) }
+    const first = SCENARIOS[0].turns[0]
+    return {
+      scenarioId: SCENARIOS[0].id,
+      id: first.id,
+      level: levelFor(initialProgress, SCENARIOS[0].id, first),
+    }
   })
 
   // 세션 큐는 시작 시점에 고정한다 (SessionView 주석 참고).
   const [queue, setQueue] = useState<QueueItem[]>(() =>
-    buildQueue(scenario, initialProgress, Date.now()),
+    buildQueue(SCENARIOS, initialProgress, Date.now()),
   )
   // 세션을 다시 뽑을 때 SessionView를 새로 마운트시키는 용도.
   // 이게 없으면 큐만 바뀌고 진행 위치(index)가 남아 완료 화면에서 벗어나지 못한다.
@@ -62,39 +73,46 @@ export default function App() {
 
   const handleAudioMissing = useCallback(() => setAudioMissing(true), [])
 
-  const handleRate = useCallback((turn: Turn, rating: Rating): ScheduleResult => {
-    const { progress: next, result } = recordRating(
-      progressRef.current,
-      scenario.id,
-      turn,
-      rating,
-    )
-    progressRef.current = next
-    setProgress(next)
-    return result
-  }, [])
+  const handleRate = useCallback(
+    (sid: string, turn: Turn, rating: Rating): ScheduleResult => {
+      const { progress: next, result } = recordRating(progressRef.current, sid, turn, rating)
+      progressRef.current = next
+      setProgress(next)
+      return result
+    },
+    [],
+  )
 
-  const handleAttempt = useCallback((turnId: number) => {
-    const next = recordAttempt(progressRef.current, scenario.id, turnId)
+  const handleAttempt = useCallback((sid: string, turnId: number) => {
+    const next = recordAttempt(progressRef.current, sid, turnId)
     progressRef.current = next
     setProgress(next)
   }, [])
 
   const restartSession = useCallback(() => {
-    setQueue(buildQueue(scenario, progressRef.current, Date.now()))
+    setQueue(buildQueue(SCENARIOS, progressRef.current, Date.now()))
     setSessionId((n) => n + 1)
   }, [])
 
-  const activate = useCallback((turn: Turn) => {
-    setActive({ id: turn.id, level: levelFor(progressRef.current, scenario.id, turn) })
+  const activate = useCallback((s: Scenario, turn: Turn) => {
+    setActive({
+      scenarioId: s.id,
+      id: turn.id,
+      level: levelFor(progressRef.current, s.id, turn),
+    })
   }, [])
 
-  const progressOf = useCallback(
-    (turnId: number) => getTurnProgress(progress, scenario.id, turnId),
-    [progress],
-  )
+  const selectScenario = useCallback((s: Scenario) => {
+    setScenarioId(s.id)
+    const first = s.turns[0]
+    setActive({ scenarioId: s.id, id: first.id, level: levelFor(progressRef.current, s.id, first) })
+  }, [])
 
-  const pending = pendingCount(scenario, progress, Date.now())
+  const pending = pendingCount(SCENARIOS, progress, Date.now())
+
+  /** 이 상황에서 한 번이라도 연습한 문장 수 */
+  const practicedIn = (s: Scenario) =>
+    s.turns.filter((t) => (getTurnProgress(progress, s.id, t.id)?.attempts ?? 0) > 0).length
 
   const panelDeps = {
     library,
@@ -109,9 +127,10 @@ export default function App() {
     <div className="app">
       <header className="app-head">
         <div>
-          <h1>{scenario.title}</h1>
+          <h1>섀도잉 트레이너</h1>
           <p className="app-sub">
-            {scenario.level} · {scenario.turns.length}문장
+            상황 {SCENARIOS.length}개 · 문장{' '}
+            {SCENARIOS.reduce((n, s) => n + s.turns.length, 0)}개
           </p>
         </div>
       </header>
@@ -148,10 +167,9 @@ export default function App() {
       {tab === 'session' ? (
         <SessionView
           key={sessionId}
-          scenario={scenario}
           queue={queue}
-          appearances={appearances}
-          progressOf={progressOf}
+          appearancesFor={appearancesFor}
+          progressOf={(sid, turnId) => getTurnProgress(progress, sid, turnId)}
           onRate={handleRate}
           onAttempt={handleAttempt}
           onRestart={restartSession}
@@ -159,6 +177,25 @@ export default function App() {
         />
       ) : (
         <>
+          <div className="scenario-picker">
+            {SCENARIOS.map((s) => {
+              const done = practicedIn(s)
+              return (
+                <button
+                  key={s.id}
+                  type="button"
+                  className={`scenario-chip ${s.id === scenario.id ? 'scenario-chip-on' : ''}`}
+                  onClick={() => selectScenario(s)}
+                >
+                  <span className="scenario-title">{s.title}</span>
+                  <span className="scenario-meta">
+                    {s.level} · {done}/{s.turns.length}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+
           <div className="tip-intro">
             점수는 매기지 않습니다. 원본과 내 목소리를 번갈아 들으며 직접 비교하고, 각 문장의{' '}
             <strong>발음 유의점</strong>에 있는 <strong>‘맞는지 확인하는 법’</strong>으로 스스로
@@ -166,23 +203,24 @@ export default function App() {
           </div>
 
           <main className="turns">
-            {scenario.turns.map((turn) => (
-              <TurnCard
-                key={turn.id}
-                scenario={scenario}
-                turn={turn}
-                level={
-                  turn.id === active.id ? active.level : levelFor(progress, scenario.id, turn)
-                }
-                firstAppearing={appearances.get(turn.id) ?? new Set()}
-                isActive={turn.id === active.id}
-                onActivate={() => activate(turn)}
-                progress={progressOf(turn.id)}
-                onRate={(rating) => handleRate(turn, rating)}
-                onAttempt={() => handleAttempt(turn.id)}
-                {...panelDeps}
-              />
-            ))}
+            {scenario.turns.map((turn) => {
+              const isActive = active.scenarioId === scenario.id && active.id === turn.id
+              return (
+                <TurnCard
+                  key={`${scenario.id}:${turn.id}`}
+                  scenario={scenario}
+                  turn={turn}
+                  level={isActive ? active.level : levelFor(progress, scenario.id, turn)}
+                  firstAppearing={appearancesFor(scenario.id, turn.id)}
+                  isActive={isActive}
+                  onActivate={() => activate(scenario, turn)}
+                  progress={getTurnProgress(progress, scenario.id, turn.id)}
+                  onRate={(rating) => handleRate(scenario.id, turn, rating)}
+                  onAttempt={() => handleAttempt(scenario.id, turn.id)}
+                  {...panelDeps}
+                />
+              )
+            })}
           </main>
         </>
       )}

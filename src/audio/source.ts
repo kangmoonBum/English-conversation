@@ -1,4 +1,4 @@
-import type { Scenario, Speed, Turn } from '../types'
+import type { Speed, Turn } from '../types'
 import type { AudioEngine } from './player'
 
 /**
@@ -53,24 +53,21 @@ export class AudioSource {
   /** 한 번이라도 파일이 없었는지 — 안내 배너 표시에 쓴다. */
   private sawMissingFile = false
 
-  constructor(
-    private engine: AudioEngine,
-    private scenario: Scenario,
-  ) {}
+  // 시나리오마다 turn.id가 1부터 다시 시작하므로 캐시 키에 시나리오 id를 반드시 넣는다.
+  // 넣지 않으면 카페 1번 대사가 호텔 1번 대사로 재생된다.
+  constructor(private engine: AudioEngine) {}
 
   get hasMissingAudio(): boolean {
     return this.sawMissingFile
   }
 
-  async resolve(turn: Turn, speed: Speed): Promise<ResolvedAudio> {
-    const key = `${turn.id}:${speed}`
+  async resolve(scenarioId: string, turn: Turn, speed: Speed): Promise<ResolvedAudio> {
+    const key = `${scenarioId}:${turn.id}:${speed}`
     const cached = this.cache.get(key)
     if (cached) return cached
 
     const file = turn.audio?.[speed]
-    const buffer = file
-      ? await fetchBuffer(this.engine, candidateUrls(this.scenario.id, file))
-      : null
+    const buffer = file ? await fetchBuffer(this.engine, candidateUrls(scenarioId, file)) : null
 
     const result: ResolvedAudio = buffer ? { kind: 'file', buffer } : MISSING
     if (!buffer) this.sawMissingFile = true
@@ -79,16 +76,16 @@ export class AudioSource {
   }
 
   /** 원본을 재생한다. 파일이 없으면 아무 소리도 내지 않고 false를 돌려준다. */
-  async play(turn: Turn, speed: Speed): Promise<boolean> {
-    const resolved = await this.resolve(turn, speed)
+  async play(scenarioId: string, turn: Turn, speed: Speed): Promise<boolean> {
+    const resolved = await this.resolve(scenarioId, turn, speed)
     if (resolved.kind !== 'file' || !resolved.buffer) return false
     await this.engine.play(resolved.buffer)
     return true
   }
 
   /** 파형 비교용 버퍼. 파일이 없으면 null이다. */
-  async buffer(turn: Turn, speed: Speed): Promise<AudioBuffer | null> {
-    return (await this.resolve(turn, speed)).buffer
+  async buffer(scenarioId: string, turn: Turn, speed: Speed): Promise<AudioBuffer | null> {
+    return (await this.resolve(scenarioId, turn, speed)).buffer
   }
 }
 

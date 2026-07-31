@@ -164,7 +164,7 @@ describe('buildQueue', () => {
   const scenario = scenarioOf([partnerTurn(1), userTurn(2), userTurn(3), userTurn(4)])
 
   it('진행도가 없으면 전부 새 문장으로 시작 단계에서 낸다', () => {
-    const queue = buildQueue(scenario, { version: 2, scenarios: {} }, NOW)
+    const queue = buildQueue([scenario], { version: 2, scenarios: {} }, NOW)
     expect(queue).toHaveLength(4)
     expect(queue.every((q) => q.reason === 'new')).toBe(true)
     expect(queue.every((q) => q.level === INITIAL_LEVEL)).toBe(true)
@@ -177,7 +177,7 @@ describe('buildQueue', () => {
       3: tp({ dueAt: NOW + 5 * DAY }),
       4: tp({ dueAt: NOW + 5 * DAY }),
     })
-    expect(buildQueue(scenario, progress, NOW)).toHaveLength(0)
+    expect(buildQueue([scenario], progress, NOW)).toHaveLength(0)
   })
 
   it('많이 밀린 것부터 낸다', () => {
@@ -186,13 +186,13 @@ describe('buildQueue', () => {
       3: tp({ dueAt: NOW - 9 * DAY }),
       4: tp({ dueAt: NOW - 5 * DAY }),
     })
-    const queue = buildQueue(scenario, progress, NOW)
+    const queue = buildQueue([scenario], progress, NOW)
     expect(queue.filter((q) => q.reason === 'due').map((q) => q.turn.id)).toEqual([3, 4, 2])
   })
 
   it('기한이 된 것을 새 문장보다 먼저 낸다', () => {
     const progress = progressOf({ 4: tp({ dueAt: NOW - DAY }) })
-    const queue = buildQueue(scenario, progress, NOW)
+    const queue = buildQueue([scenario], progress, NOW)
     expect(queue[0].turn.id).toBe(4)
     expect(queue[0].reason).toBe('due')
     expect(queue.slice(1).every((q) => q.reason === 'new')).toBe(true)
@@ -200,27 +200,67 @@ describe('buildQueue', () => {
 
   it('저장된 레벨로 낸다', () => {
     const progress = progressOf({ 2: tp({ level: 'freestyle', dueAt: NOW - DAY }) })
-    const queue = buildQueue(scenario, progress, NOW)
+    const queue = buildQueue([scenario], progress, NOW)
     expect(queue[0].level).toBe('freestyle')
   })
 
   it('저장된 레벨이 상한을 넘으면 잘라서 낸다', () => {
     const progress = progressOf({ 1: tp({ level: 'freestyle', dueAt: NOW - DAY }) })
-    const queue = buildQueue(scenario, progress, NOW)
+    const queue = buildQueue([scenario], progress, NOW)
     expect(queue[0].turn.id).toBe(1)
     expect(queue[0].level).toBe('blind')
   })
 
   it('세션 상한을 넘지 않는다', () => {
     const big = scenarioOf(Array.from({ length: 12 }, (_, i) => userTurn(i + 1)))
-    expect(buildQueue(big, { version: 2, scenarios: {} }, NOW)).toHaveLength(SESSION_SIZE)
+    expect(buildQueue([big], { version: 2, scenarios: {} }, NOW)).toHaveLength(SESSION_SIZE)
+  })
+})
+
+describe('buildQueue — 여러 시나리오', () => {
+  const cafe = { ...scenarioOf([userTurn(1), userTurn(2)]), id: 'cafe' }
+  const hotel = { ...scenarioOf([userTurn(1), userTurn(2)]), id: 'hotel' }
+
+  it('여러 상황을 한 세션에 섞어 낸다', () => {
+    const queue = buildQueue([cafe, hotel], { version: 2, scenarios: {} }, NOW)
+    expect(queue).toHaveLength(4)
+    expect(queue.map((q) => q.scenario.id)).toEqual(['cafe', 'cafe', 'hotel', 'hotel'])
+  })
+
+  it('각 항목이 자기 시나리오를 들고 다닌다', () => {
+    const queue = buildQueue([cafe, hotel], { version: 2, scenarios: {} }, NOW)
+    for (const q of queue) {
+      expect(q.scenario.turns).toContain(q.turn)
+    }
+  })
+
+  it('시나리오가 달라도 turn id가 같으면 진행도가 섞이지 않는다', () => {
+    // 두 시나리오 모두 turn 1이 있다. cafe의 1번만 기한이 멀리 밀려 있어야 한다.
+    const progress: Progress = {
+      version: 2,
+      scenarios: { cafe: { '1': tp({ dueAt: NOW + 5 * DAY }) } },
+    }
+    const ids = buildQueue([cafe, hotel], progress, NOW).map((q) => `${q.scenario.id}:${q.turn.id}`)
+    expect(ids).not.toContain('cafe:1')
+    expect(ids).toContain('hotel:1')
+  })
+
+  it('기한이 지난 것은 시나리오를 가리지 않고 먼저 나온다', () => {
+    const progress: Progress = {
+      version: 2,
+      scenarios: { hotel: { '2': tp({ dueAt: NOW - 9 * DAY }) } },
+    }
+    const queue = buildQueue([cafe, hotel], progress, NOW)
+    expect(queue[0].scenario.id).toBe('hotel')
+    expect(queue[0].turn.id).toBe(2)
+    expect(queue[0].reason).toBe('due')
   })
 })
 
 describe('pendingCount', () => {
   it('상한 없이 전체 대기 수를 센다', () => {
     const big = scenarioOf(Array.from({ length: 12 }, (_, i) => userTurn(i + 1)))
-    expect(pendingCount(big, { version: 2, scenarios: {} }, NOW)).toBe(12)
+    expect(pendingCount([big], { version: 2, scenarios: {} }, NOW)).toBe(12)
   })
 })
 

@@ -106,6 +106,7 @@ code {
   border-radius: 999px;
   border: 1px solid currentColor;
   white-space: nowrap;
+  flex-shrink: 0;   /* 세션 바에서 눌려 잘리지 않도록 */
 }
 .level-repeat { color: var(--level-repeat); }
 .level-blind { color: var(--level-blind); }
@@ -205,6 +206,44 @@ code {
   color: var(--text-dim);
 }
 .tip-intro strong { color: var(--text); }
+
+/* ---------- 상황 선택 ---------- */
+.scenario-picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.scenario-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  text-align: left;
+}
+.scenario-chip:hover { border-color: var(--accent); }
+.scenario-chip-on {
+  border-color: var(--accent);
+  background: var(--surface-2);
+}
+.scenario-title { font-size: 0.9rem; word-break: keep-all; }
+.scenario-meta {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+.scenario-chip-on .scenario-meta { color: var(--accent); }
+
+/* 세션에서 지금 문장이 어느 대화인지 알려준다 (여러 상황이 섞여 나오므로) */
+.turn-scenario {
+  color: var(--text);
+  margin-right: 8px;
+  font-weight: 600;
+}
 
 /* ---------- 턴 ---------- */
 .turns { display: flex; flex-direction: column; gap: 10px; }
@@ -324,26 +363,6 @@ code {
 }
 .btn-primary:not(:disabled):hover { filter: brightness(1.1); }
 
-/* ---------- 오버랩 ---------- */
-.overlap-toggle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.8rem;
-  color: var(--text-dim);
-  margin-bottom: 12px;
-  cursor: pointer;
-}
-.overlap-toggle input { cursor: pointer; }
-
-.hint-warn {
-  background: #2b2417;
-  border: 1px solid #4a3d21;
-  border-radius: 8px;
-  padding: 10px 12px;
-  color: #e8d5a8;
-}
-.hint-warn strong { color: #f5e4b8; }
 
 @keyframes pulse {
   0%, 100% { opacity: 1; }

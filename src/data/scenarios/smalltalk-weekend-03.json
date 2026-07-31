@@ -1,0 +1,186 @@
+{
+  "id": "smalltalk-weekend-03",
+  "title": "동료와 주말 이야기",
+  "level": "B1",
+  "roles": {
+    "A": "Coworker",
+    "B": "You"
+  },
+  "userRole": "B",
+  "voices": {
+    "A": "en-us-lessac-medium",
+    "B": "en-us-ryan-high"
+  },
+  "turns": [
+    {
+      "id": 1,
+      "role": "A",
+      "text": "Hey! How was your weekend?",
+      "ko": "안녕! 주말 어땠어요?",
+      "audio": { "normal": "01.mp3", "slow": "01_slow.mp3" },
+      "keywords": ["How was your weekend"],
+      "tips": [
+        { "ref": "z-sound", "target": "was" },
+        { "ref": "er-sound", "target": "your" },
+        { "ref": "question-intonation", "target": "How was your weekend?" }
+      ],
+      "coach": "월요일 아침에 가장 많이 듣는 문장입니다. 'How was your'는 [하워쥬어]처럼 한 덩어리로 뭉쳐서 순식간에 지나갑니다."
+    },
+    {
+      "id": 2,
+      "role": "B",
+      "text": "Pretty good, thanks. I finally got some rest.",
+      "ko": "괜찮았어요, 고마워요. 드디어 좀 쉬었어요.",
+      "audio": { "normal": "02.mp3", "slow": "02_slow.mp3" },
+      "keywords": ["Pretty good", "finally got some rest"],
+      "intentKo": "주말이 괜찮았고 드디어 좀 쉬었다고 답해라",
+      "alternatives": [
+        "It was good, thanks. I finally caught up on sleep.",
+        "Not bad. I just took it easy.",
+        "Pretty relaxing, actually. I needed it."
+      ],
+      "tips": [
+        { "ref": "flap-t", "target": "Pretty" },
+        { "ref": "l-clear", "target": "finally" },
+        { "ref": "final-stop", "target": "rest" }
+      ],
+      "coach": "'Pretty good'은 '예쁘다'와 무관하게 '꽤 괜찮다'입니다. 스몰토크 답변으로 가장 무난하고, [프리리굿]처럼 t가 'ㄹ'로 바뀝니다."
+    },
+    {
+      "id": 3,
+      "role": "A",
+      "text": "Nice. Did you do anything fun?",
+      "ko": "좋네요. 재미있는 거 했어요?",
+      "audio": { "normal": "03.mp3", "slow": "03_slow.mp3" },
+      "keywords": ["anything fun"],
+      "tips": [
+        { "ref": "th-voiceless", "target": "anything" },
+        { "ref": "f-v", "target": "fun" },
+        { "ref": "reduction", "target": "Did you" }
+      ],
+      "coach": "'Did you'는 [디쥬]로 완전히 뭉갭니다. 또박또박 '디드 유'라고 하면 바로 티가 나는 대표적인 부분입니다."
+    },
+    {
+      "id": 4,
+      "role": "B",
+      "text": "I went hiking with a friend on Saturday.",
+      "ko": "토요일에 친구랑 등산 갔어요.",
+      "audio": { "normal": "04.mp3", "slow": "04_slow.mp3" },
+      "keywords": ["went hiking", "with a friend"],
+      "intentKo": "토요일에 친구와 등산을 갔다고 말해라",
+      "alternatives": [
+        "I went on a hike with a friend Saturday.",
+        "A friend and I did some hiking on Saturday.",
+        "I hit the trails with a friend over the weekend."
+      ],
+      "tips": [
+        { "ref": "f-v", "target": "friend" },
+        { "ref": "short-i-vs-long-i", "target": "hiking" },
+        { "ref": "linking-cv", "target": "with a" }
+      ],
+      "coach": "'with a friend'는 [위더프렌드]로 이어집니다. 등산은 mountain climbing이 아니라 hiking입니다 — climbing은 암벽등반에 가깝습니다."
+    },
+    {
+      "id": 5,
+      "role": "A",
+      "text": "That sounds great. Where did you go?",
+      "ko": "좋았겠네요. 어디로 갔어요?",
+      "audio": { "normal": "05.mp3", "slow": "05_slow.mp3" },
+      "keywords": ["sounds great", "Where did you go"],
+      "tips": [
+        { "ref": "th-voiced", "target": "That" },
+        { "ref": "final-s", "target": "sounds" },
+        { "ref": "question-intonation", "target": "Where did you go?" }
+      ],
+      "coach": "'That sounds great'은 상대 이야기에 호응하는 만능 표현입니다. Wh- 의문문이라 'Where did you go?'는 끝을 내립니다."
+    },
+    {
+      "id": 6,
+      "role": "B",
+      "text": "A small mountain just outside the city.",
+      "ko": "도시 바로 외곽에 있는 작은 산이요.",
+      "audio": { "normal": "06.mp3", "slow": "06_slow.mp3" },
+      "keywords": ["small mountain", "outside the city"],
+      "intentKo": "도시 바로 바깥의 작은 산이었다고 답해라",
+      "alternatives": [
+        "Just a small mountain near the city.",
+        "There's a little mountain right outside town.",
+        "Some place just outside the city, nothing far."
+      ],
+      "tips": [
+        { "ref": "l-clear", "target": "small" },
+        { "ref": "flap-t", "target": "city" },
+        { "ref": "sentence-stress", "target": "just outside the" }
+      ],
+      "coach": "완전한 문장이 아니어도 됩니다. 스몰토크에서는 이렇게 명사구로 짧게 답하는 게 오히려 자연스럽습니다."
+    },
+    {
+      "id": 7,
+      "role": "A",
+      "text": "I should try that. I sat at home all weekend.",
+      "ko": "저도 해봐야겠어요. 저는 주말 내내 집에 있었어요.",
+      "audio": { "normal": "07.mp3", "slow": "07_slow.mp3" },
+      "keywords": ["should try that", "sat at home"],
+      "tips": [
+        { "ref": "sh-vs-s", "target": "should" },
+        { "ref": "ae-vs-e", "target": "sat" },
+        { "ref": "reduction", "target": "at home all" }
+      ],
+      "coach": "'sat'과 'set'은 한국어 화자에게 같은 소리로 들리기 쉽습니다. sat은 턱을 훨씬 아래로 내려 입을 크게 벌려야 구별됩니다."
+    },
+    {
+      "id": 8,
+      "role": "B",
+      "text": "Honestly, that sounds pretty good too.",
+      "ko": "솔직히 그것도 꽤 좋은데요.",
+      "audio": { "normal": "08.mp3", "slow": "08_slow.mp3" },
+      "keywords": ["Honestly", "sounds pretty good"],
+      "intentKo": "집에서 쉬는 것도 나쁘지 않다고 가볍게 맞장구쳐라",
+      "alternatives": [
+        "Honestly, that doesn't sound bad at all.",
+        "To be fair, that sounds nice too.",
+        "Hey, sometimes that's exactly what you need."
+      ],
+      "tips": [
+        { "ref": "short-u-vs-long-u", "target": "good" },
+        { "ref": "flap-t", "target": "pretty" },
+        { "ref": "word-stress", "target": "Honestly" }
+      ],
+      "coach": "상대가 자기를 낮추면 가볍게 받아주는 게 예의입니다. 'Honestly'는 첫 음절에 강세가 오고 h는 발음하되 [어니스틀리]에 가깝게 뭉갭니다."
+    },
+    {
+      "id": 9,
+      "role": "A",
+      "text": "True. Anyway, are you free for lunch later?",
+      "ko": "맞아요. 그건 그렇고, 이따 점심 시간 되세요?",
+      "audio": { "normal": "09.mp3", "slow": "09_slow.mp3" },
+      "keywords": ["Anyway", "free for lunch"],
+      "tips": [
+        { "ref": "consonant-cluster", "target": "True" },
+        { "ref": "f-v", "target": "free" },
+        { "ref": "question-intonation", "target": "are you free for lunch later?" }
+      ],
+      "coach": "'Anyway'는 화제를 바꿀 때 쓰는 신호입니다. 이게 들리면 앞 이야기가 끝나고 본론이 온다는 뜻이니 귀를 세우세요."
+    },
+    {
+      "id": 10,
+      "role": "B",
+      "text": "Sure, let's grab something around noon.",
+      "ko": "좋아요, 정오쯤에 뭐 좀 먹으러 가요.",
+      "audio": { "normal": "10.mp3", "slow": "10_slow.mp3" },
+      "keywords": ["let's grab something", "around noon"],
+      "intentKo": "점심 제안을 수락하고 정오쯤 먹자고 말해라",
+      "alternatives": [
+        "Sure, how about around noon?",
+        "Sounds good. Let's meet at twelve.",
+        "Yeah, I'm free. Grab a bite around noon?"
+      ],
+      "tips": [
+        { "ref": "consonant-cluster", "target": "grab" },
+        { "ref": "short-u-vs-long-u", "target": "noon" },
+        { "ref": "th-voiceless", "target": "something" }
+      ],
+      "coach": "'grab something'은 '간단히 먹다'는 뜻으로 원어민이 매일 씁니다. 'eat lunch'보다 훨씬 자연스럽고 캐주얼합니다."
+    }
+  ]
+}

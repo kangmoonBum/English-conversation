@@ -155,6 +155,8 @@ function formatInterval(ms: number): string {
 export type QueueReason = 'due' | 'new'
 
 export interface QueueItem {
+  /** 여러 상황을 한 세션에서 섞어 내므로 각 항목이 자기 시나리오를 들고 다닌다. */
+  scenario: Scenario
   turn: Turn
   level: PracticeLevel
   progress?: TurnProgress
@@ -175,12 +177,15 @@ function turnProgress(
 /**
  * 오늘 연습할 문장을 고른다.
  *
+ * 여러 상황을 한 세션에 섞어서 낸다. 복습은 "어느 대화였는지"가 아니라
+ * "언제 다시 볼 때가 됐는지"로 정해져야 하고, 실전에서도 상황은 예고 없이 온다.
+ *
  * 기한이 지난 것을 먼저(많이 밀린 순서대로), 그다음 아직 해보지 않은 것을
  * 대화 순서대로 채운다. 아직 기한이 안 된 문장은 넣지 않는다 —
  * 세션이 짧게 끝나는 편이 안 여는 것보다 낫다.
  */
 export function buildQueue(
-  scenario: Scenario,
+  scenarios: Scenario[],
   progress: Progress,
   now: number,
   limit: number = SESSION_SIZE,
@@ -188,15 +193,23 @@ export function buildQueue(
   const due: QueueItem[] = []
   const fresh: QueueItem[] = []
 
-  for (const turn of scenario.turns) {
-    const tp = turnProgress(progress, scenario.id, turn.id)
+  for (const scenario of scenarios) {
+    for (const turn of scenario.turns) {
+      const tp = turnProgress(progress, scenario.id, turn.id)
 
-    if (!tp) {
-      fresh.push({ turn, level: INITIAL_LEVEL, progress: undefined, reason: 'new' })
-      continue
-    }
-    if (tp.dueAt <= now) {
-      due.push({ turn, level: clampLevel(tp.level, turn), progress: tp, reason: 'due' })
+      if (!tp) {
+        fresh.push({ scenario, turn, level: INITIAL_LEVEL, progress: undefined, reason: 'new' })
+        continue
+      }
+      if (tp.dueAt <= now) {
+        due.push({
+          scenario,
+          turn,
+          level: clampLevel(tp.level, turn),
+          progress: tp,
+          reason: 'due',
+        })
+      }
     }
   }
 
@@ -207,8 +220,8 @@ export function buildQueue(
 }
 
 /** 탭 배지에 쓸 개수. limit를 걸지 않은 전체 대기 수다. */
-export function pendingCount(scenario: Scenario, progress: Progress, now: number): number {
-  return buildQueue(scenario, progress, now, Number.MAX_SAFE_INTEGER).length
+export function pendingCount(scenarios: Scenario[], progress: Progress, now: number): number {
+  return buildQueue(scenarios, progress, now, Number.MAX_SAFE_INTEGER).length
 }
 
 /** 이 문장을 지금 어느 단계로 낼지. 진행도가 없으면 시작 단계. */

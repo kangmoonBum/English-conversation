@@ -1,0 +1,186 @@
+{
+  "id": "hotel-checkin-02",
+  "title": "호텔 체크인",
+  "level": "A2",
+  "roles": {
+    "A": "Front Desk",
+    "B": "Guest"
+  },
+  "userRole": "B",
+  "voices": {
+    "A": "en-us-lessac-medium",
+    "B": "en-us-ryan-high"
+  },
+  "turns": [
+    {
+      "id": 1,
+      "role": "A",
+      "text": "Good evening. Do you have a reservation with us?",
+      "ko": "안녕하세요. 예약하셨나요?",
+      "audio": { "normal": "01.mp3", "slow": "01_slow.mp3" },
+      "keywords": ["Good evening", "reservation"],
+      "tips": [
+        { "ref": "v-vs-b", "target": "evening" },
+        { "ref": "er-sound", "target": "reservation" },
+        { "ref": "question-intonation", "target": "Do you have a reservation with us?" }
+      ],
+      "coach": "'Do you have a'는 [두유해버]처럼 뭉칩니다. 프런트에서 가장 먼저 듣는 말이니 통째로 외워두면 당황하지 않습니다."
+    },
+    {
+      "id": 2,
+      "role": "B",
+      "text": "Yes, I have a reservation under Kim.",
+      "ko": "네, 김으로 예약했습니다.",
+      "audio": { "normal": "02.mp3", "slow": "02_slow.mp3" },
+      "keywords": ["reservation", "under Kim"],
+      "intentKo": "'김'이라는 이름으로 예약했다고 말해라",
+      "alternatives": [
+        "I have a reservation under the name Kim.",
+        "Yes, it should be under Kim.",
+        "I booked a room under Kim."
+      ],
+      "tips": [
+        { "ref": "z-sound", "target": "Yes" },
+        { "ref": "er-sound", "target": "under" },
+        { "ref": "linking-cv", "target": "have a" }
+      ],
+      "coach": "예약자 이름을 말할 땐 'under + 이름'이 정석입니다. 'My name is Kim'보다 이 표현이 프런트에서 훨씬 자연스럽게 통합니다."
+    },
+    {
+      "id": 3,
+      "role": "A",
+      "text": "Perfect. Could I see your passport, please?",
+      "ko": "좋습니다. 여권 좀 보여주시겠어요?",
+      "audio": { "normal": "03.mp3", "slow": "03_slow.mp3" },
+      "keywords": ["see your passport"],
+      "tips": [
+        { "ref": "f-v", "target": "Perfect" },
+        { "ref": "ae-vs-e", "target": "passport" },
+        { "ref": "question-intonation", "target": "Could I see your passport, please?" }
+      ],
+      "coach": "'Could I see your'는 [쿠라이씨유어]처럼 이어집니다. 여권·신용카드를 요구할 때 거의 이 문장 그대로 나옵니다."
+    },
+    {
+      "id": 4,
+      "role": "B",
+      "text": "Sure, here it is. Is breakfast included?",
+      "ko": "네, 여기 있습니다. 조식 포함인가요?",
+      "audio": { "normal": "04.mp3", "slow": "04_slow.mp3" },
+      "keywords": ["here it is", "breakfast included"],
+      "intentKo": "여권을 건네면서 조식이 포함인지 물어라",
+      "alternatives": [
+        "Here you go. Does that include breakfast?",
+        "Here it is. Is breakfast part of the rate?",
+        "Sure. Do we get breakfast with the room?"
+      ],
+      "tips": [
+        { "ref": "linking-cv", "target": "here it is" },
+        { "ref": "consonant-cluster", "target": "breakfast" },
+        { "ref": "final-ed", "target": "included" }
+      ],
+      "coach": "'here it is'는 [히어리리즈] 한 덩어리입니다. 물건을 건넬 때 쓰는 관용구라 단어를 하나씩 끊으면 바로 어색해집니다."
+    },
+    {
+      "id": 5,
+      "role": "A",
+      "text": "Yes, it's served from six thirty to ten in the main hall.",
+      "ko": "네, 6시 30분부터 10시까지 메인 홀에서 제공됩니다.",
+      "audio": { "normal": "05.mp3", "slow": "05_slow.mp3" },
+      "keywords": ["six thirty to ten", "main hall"],
+      "tips": [
+        { "ref": "th-voiceless", "target": "thirty" },
+        { "ref": "final-ed", "target": "served" },
+        { "ref": "l-clear", "target": "hall" }
+      ],
+      "coach": "시간을 말할 때 'from A to B' 구조에서 A와 B만 강하게 나옵니다. 사이의 from·to는 거의 안 들릴 만큼 뭉개집니다."
+    },
+    {
+      "id": 6,
+      "role": "B",
+      "text": "Great. Could I get a room on a higher floor?",
+      "ko": "좋네요. 높은 층으로 방을 받을 수 있을까요?",
+      "audio": { "normal": "06.mp3", "slow": "06_slow.mp3" },
+      "keywords": ["higher floor"],
+      "intentKo": "높은 층 방으로 배정해달라고 정중히 요청해라",
+      "alternatives": [
+        "Would it be possible to get a higher floor?",
+        "Could we have a room upstairs, if possible?",
+        "Do you have anything on a higher floor?"
+      ],
+      "tips": [
+        { "ref": "r-initial", "target": "room" },
+        { "ref": "l-clear", "target": "floor" },
+        { "ref": "linking-cv", "target": "get a" }
+      ],
+      "coach": "요청은 'Could I ~?'로 시작하면 실패가 없습니다. 'I want a higher floor'는 명령처럼 들려서 프런트에서 쓰지 않는 게 좋습니다."
+    },
+    {
+      "id": 7,
+      "role": "A",
+      "text": "Let me check. I can offer you room five twelve.",
+      "ko": "확인해볼게요. 512호를 드릴 수 있습니다.",
+      "audio": { "normal": "07.mp3", "slow": "07_slow.mp3" },
+      "keywords": ["Let me check", "five twelve"],
+      "tips": [
+        { "ref": "f-v", "target": "offer" },
+        { "ref": "short-i-vs-long-i", "target": "twelve" },
+        { "ref": "sentence-stress", "target": "I can" }
+      ],
+      "coach": "호실은 512를 'five hundred twelve'가 아니라 [파이브 트웰브]처럼 숫자를 끊어 읽습니다. 방 번호·전화번호는 대부분 이 방식입니다."
+    },
+    {
+      "id": 8,
+      "role": "B",
+      "text": "That works. What time is checkout?",
+      "ko": "좋습니다. 체크아웃은 몇 시인가요?",
+      "audio": { "normal": "08.mp3", "slow": "08_slow.mp3" },
+      "keywords": ["That works", "What time is checkout"],
+      "intentKo": "방을 수락하고 체크아웃 시간을 물어라",
+      "alternatives": [
+        "That's fine. When is checkout?",
+        "Sounds good. What's the checkout time?",
+        "That'll work. How late can we check out?"
+      ],
+      "tips": [
+        { "ref": "th-voiced", "target": "That" },
+        { "ref": "er-sound", "target": "works" },
+        { "ref": "question-intonation", "target": "What time is checkout?" }
+      ],
+      "coach": "'That works'는 제안을 수락하는 가장 무난한 한마디입니다. 'OK'보다 성의 있게 들리면서도 과하지 않습니다."
+    },
+    {
+      "id": 9,
+      "role": "A",
+      "text": "Checkout is at eleven. Here are your keys.",
+      "ko": "체크아웃은 11시입니다. 여기 열쇠입니다.",
+      "audio": { "normal": "09.mp3", "slow": "09_slow.mp3" },
+      "keywords": ["at eleven", "your keys"],
+      "tips": [
+        { "ref": "l-clear", "target": "eleven" },
+        { "ref": "final-s", "target": "keys" },
+        { "ref": "linking-cv", "target": "Here are your" }
+      ],
+      "coach": "'keys'의 끝소리는 [스]가 아니라 [즈]입니다. 앞이 유성음이라 -s가 /z/로 바뀌는 대표 사례입니다."
+    },
+    {
+      "id": 10,
+      "role": "B",
+      "text": "Thank you so much. Have a good night.",
+      "ko": "정말 감사합니다. 좋은 밤 되세요.",
+      "audio": { "normal": "10.mp3", "slow": "10_slow.mp3" },
+      "keywords": ["Thank you so much", "good night"],
+      "intentKo": "감사 인사를 하고 좋은 밤 보내라고 인사해라",
+      "alternatives": [
+        "Thanks a lot. Have a good one.",
+        "Thank you. Good night.",
+        "Appreciate it. Have a nice evening."
+      ],
+      "tips": [
+        { "ref": "th-voiceless", "target": "Thank" },
+        { "ref": "final-stop", "target": "good" },
+        { "ref": "reduction", "target": "Have a" }
+      ],
+      "coach": "'Have a good night'은 [해버굿나잇]으로 뭉칩니다. 저녁에 헤어질 때 쓰고, 낮이라면 'Have a good day'로 바꾸면 됩니다."
+    }
+  ]
+}

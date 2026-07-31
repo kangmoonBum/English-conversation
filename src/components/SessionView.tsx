@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { Rating, Scenario, TipLibrary, Turn, TurnProgress } from '../types'
+import type { Rating, TipLibrary, Turn, TurnProgress } from '../types'
 import type { AudioEngine } from '../audio/player'
 import type { AudioSource, WordAudio } from '../audio/source'
 import type { Recorder } from '../audio/recorder'
@@ -8,17 +8,16 @@ import { LEVEL_LABEL } from '../srs'
 import { PracticePanel } from './PracticePanel'
 
 interface Props {
-  scenario: Scenario
   queue: QueueItem[]
   library: TipLibrary
   engine: AudioEngine
   source: AudioSource
   words: WordAudio
   recorder: Recorder
-  appearances: Map<number, Set<string>>
-  progressOf: (turnId: number) => TurnProgress | undefined
-  onRate: (turn: Turn, rating: Rating) => ScheduleResult
-  onAttempt: (turnId: number) => void
+  appearancesFor: (scenarioId: string, turnId: number) => Set<string>
+  progressOf: (scenarioId: string, turnId: number) => TurnProgress | undefined
+  onRate: (scenarioId: string, turn: Turn, rating: Rating) => ScheduleResult
+  onAttempt: (scenarioId: string, turnId: number) => void
   onAudioMissing: () => void
   onRestart: () => void
 }
@@ -27,14 +26,15 @@ interface Props {
  * 오늘의 연습.
  *
  * 복습 큐에서 뽑은 문장을 한 번에 하나씩, 각자의 단계로 진행한다.
+ * 여러 상황이 섞여 나오므로 문장마다 어느 대화인지 함께 보여준다.
  * 5분 안에 끝나야 매일 열게 되므로 한 세션은 최대 5문장이다.
  *
  * 큐는 세션 시작 시점에 고정된다. 평가할 때마다 다시 계산하면 방금 평가한 문장이
  * 기한이 미뤄져 목록에서 사라지고, 진행 중인 세션이 눈앞에서 줄어든다.
  */
 export function SessionView({
-  scenario,
   queue,
+  appearancesFor,
   progressOf,
   onRate,
   onAttempt,
@@ -55,10 +55,7 @@ export function SessionView({
     )
   }
 
-  const item = queue[Math.min(index, queue.length - 1)]
-  const isLast = index >= queue.length - 1
   const done = index >= queue.length
-
   if (done) {
     return (
       <div className="session-empty">
@@ -74,6 +71,12 @@ export function SessionView({
     )
   }
 
+  const item = queue[index]
+  const { scenario, turn } = item
+  const isLast = index >= queue.length - 1
+  const isUserTurn = turn.role === scenario.userRole
+  const roleName = scenario.roles[turn.role] ?? turn.role
+
   return (
     <div className="session">
       <div className="session-bar">
@@ -83,7 +86,7 @@ export function SessionView({
         <div className="session-dots">
           {queue.map((q, i) => (
             <span
-              key={q.turn.id}
+              key={`${q.scenario.id}:${q.turn.id}`}
               className={`session-dot ${i === index ? 'session-dot-on' : ''} ${
                 i < index ? 'session-dot-done' : ''
               }`}
@@ -93,32 +96,28 @@ export function SessionView({
         <span className={`level-badge level-${item.level}`}>{LEVEL_LABEL[item.level]}</span>
       </div>
 
-      <article className="turn turn-open">
+      <article className={`turn turn-open ${isUserTurn ? 'turn-mine' : ''}`}>
         <header className="turn-head">
           <span className="turn-role">
-            {item.turn.role === scenario.userRole
-              ? `나 · ${scenario.roles[item.turn.role]}`
-              : scenario.roles[item.turn.role]}
+            {/* 여러 상황이 섞여 나오므로 어느 대화인지 먼저 알려준다. */}
+            <span className="turn-scenario">{scenario.title}</span>
+            {isUserTurn ? `나 · ${roleName}` : roleName}
           </span>
           <span className="turn-meta">
-            {item.reason === 'new' ? (
-              <span className="turn-attempts">처음</span>
-            ) : (
-              <span className="turn-attempts">복습</span>
-            )}
+            <span className="turn-attempts">{item.reason === 'new' ? '처음' : '복습'}</span>
           </span>
         </header>
 
         <PracticePanel
           // 문장이 바뀌면 연습 상태를 완전히 새로 시작한다.
-          key={`${item.turn.id}:${item.level}`}
+          key={`${scenario.id}:${turn.id}:${item.level}`}
           scenario={scenario}
-          turn={item.turn}
+          turn={turn}
           level={item.level}
-          firstAppearing={panelProps.appearances.get(item.turn.id) ?? new Set()}
-          progress={progressOf(item.turn.id)}
-          onRate={(rating) => onRate(item.turn, rating)}
-          onAttempt={() => onAttempt(item.turn.id)}
+          firstAppearing={appearancesFor(scenario.id, turn.id)}
+          progress={progressOf(scenario.id, turn.id)}
+          onRate={(rating) => onRate(scenario.id, turn, rating)}
+          onAttempt={() => onAttempt(scenario.id, turn.id)}
           {...panelProps}
         />
       </article>
