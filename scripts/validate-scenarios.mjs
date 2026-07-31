@@ -174,6 +174,24 @@ for (const file of scenarioFiles) {
     if (turn.role === scenario.userRole && !turn.coach) {
       warn(tAt, '학습자 차례인데 coach 노하우가 없습니다')
     }
+
+    // --- 난이도 사다리에 필요한 필드 ---
+    // 모든 문장은 'blind'(키워드만 보고 말하기) 단계까지 올라간다.
+    // 키워드가 없으면 그 단계에서 아무 힌트 없이 빈 화면만 보게 된다.
+    if ((turn.keywords ?? []).length === 0) {
+      err(tAt, "keywords가 없습니다 — '키워드만 보고' 단계에서 힌트가 비어버립니다")
+    }
+
+    // 'freestyle'(한국어 지시만 보고 말하기)은 학습자 차례에만 적용된다.
+    // 둘 중 하나라도 없으면 srs.maxLevel이 blind로 막으므로 오류는 아니지만,
+    // 사다리의 마지막 칸을 잃는 것이라 알려준다.
+    if (turn.role === scenario.userRole) {
+      if (!turn.intentKo) {
+        warn(tAt, "intentKo가 없어 '자유롭게 말하기' 단계로 올라가지 못합니다")
+      } else if ((turn.alternatives ?? []).length === 0) {
+        warn(tAt, "alternatives가 없어 '자유롭게 말하기' 단계로 올라가지 못합니다")
+      }
+    }
   }
 }
 

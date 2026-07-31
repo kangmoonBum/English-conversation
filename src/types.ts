@@ -85,7 +85,24 @@ export interface Scenario {
 /** 자기 평가 3단계. 채점이 없으므로 이것이 유일한 복습 신호다. */
 export type Rating = 'again' | 'ok' | 'good'
 
+/**
+ * 문장별 연습 난이도.
+ *
+ * 복습 큐가 단순히 같은 드릴을 반복시키는 게 아니라 이 사다리를 한 칸씩 올려준다.
+ * 😀를 받으면 다음에 그 문장은 더 어려운 단계로 나타나므로, "복습"과 "실력 향상"이
+ * 같은 동작이 된다.
+ *
+ *   repeat    영문 전체를 보고 따라 말하기
+ *   blind     키워드만 보고 소리로 복원하기
+ *   freestyle 한국어 지시만 보고 자유롭게 말하기
+ */
+export type PracticeLevel = 'repeat' | 'blind' | 'freestyle'
+
 export interface TurnProgress {
+  /** 다음에 이 문장을 어느 단계로 낼지 */
+  level: PracticeLevel
+  /** 복습 기한 (epoch ms). 이 시각이 지나면 오늘의 연습에 나타난다. */
+  dueAt: number
   rating: Rating
   /** epoch ms */
   ratedAt: number
@@ -94,9 +111,18 @@ export interface TurnProgress {
 }
 
 export interface Progress {
-  version: 1
+  version: 2
   /** scenarioId → turnId → 진행도 */
   scenarios: Record<string, Record<string, TurnProgress>>
+}
+
+/** 마이그레이션 전 형식. loadProgress에서만 쓴다. */
+export interface ProgressV1 {
+  version: 1
+  scenarios: Record<
+    string,
+    Record<string, { rating: Rating; ratedAt: number; attempts: number }>
+  >
 }
 
 /** 녹음이 끝났을 때 Recorder가 돌려주는 결과 */
