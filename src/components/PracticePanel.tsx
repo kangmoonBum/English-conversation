@@ -128,6 +128,9 @@ export function PracticePanel({
           onAudioMissing()
           setError('이 문장의 음성 파일이 없습니다. `npm run audio:build`를 실행하세요.')
         }
+      } catch (e) {
+        // 브라우저가 오디오를 막은 경우 — 모바일에서 가장 흔하다.
+        setError(e instanceof Error ? e.message : '소리를 재생하지 못했습니다.')
       } finally {
         setStatus('idle')
       }
@@ -177,6 +180,8 @@ export function PracticePanel({
     setStatus('playing')
     try {
       await engine.play(mine)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '소리를 재생하지 못했습니다.')
     } finally {
       setStatus('idle')
     }
@@ -189,6 +194,8 @@ export function PracticePanel({
       await playAba(engine, original, mine, {
         onSegment: (seg) => setAbaSegment(seg === 'mine' ? '내 녹음' : '원본'),
       })
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '소리를 재생하지 못했습니다.')
     } finally {
       setAbaSegment(null)
       setStatus('idle')
@@ -292,7 +299,16 @@ export function PracticePanel({
                 tip={library[ref.ref]}
                 defaultOpen={firstAppearing.has(ref.ref)}
                 highlighted={activeTip === ref.ref}
-                onPlayWord={(word) => words.play(word)}
+                onPlayWord={async (word) => {
+                  try {
+                    return await words.play(word)
+                  } catch (e) {
+                    // 파일이 없어서가 아니라 브라우저가 막은 것이므로
+                    // 버튼을 비활성화하지 않고 안내만 띄운다.
+                    setError(e instanceof Error ? e.message : '소리를 재생하지 못했습니다.')
+                    return true
+                  }
+                }}
               />
             ) : null,
           )}

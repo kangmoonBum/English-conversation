@@ -65,7 +65,11 @@ export default function App() {
 
   useEffect(() => {
     void purgeExpired()
+    // 모바일은 사용자가 화면을 한 번 만지기 전까지 소리를 내주지 않는다.
+    // 재생 버튼에서만 깨우면 늦으므로 문서 전체의 첫 제스처에 걸어둔다.
+    const removeUnlock = engine.installUnlock()
     return () => {
+      removeUnlock()
       recorder.release()
       void engine.close()
     }
