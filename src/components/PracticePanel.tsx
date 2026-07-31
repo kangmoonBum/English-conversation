@@ -309,7 +309,12 @@ export function PracticePanel({
       )}
       {error && <p className="error">{error}</p>}
 
-      {mine && (
+      {/*
+        정답을 공개하기 전에는 이전 녹음을 꺼내 보여주지 않는다.
+        freestyle에서 A/B/A 비교 버튼이 보이면 그걸 눌러 원본을 들을 수 있고,
+        그건 말해보기도 전에 답을 알려주는 셈이다.
+      */}
+      {revealed && mine && (
         <>
           <div className="controls">
             <button type="button" disabled={busy} onClick={() => void playMine()}>

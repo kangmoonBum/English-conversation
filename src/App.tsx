@@ -48,6 +48,9 @@ export default function App() {
   const [queue, setQueue] = useState<QueueItem[]>(() =>
     buildQueue(scenario, initialProgress, Date.now()),
   )
+  // 세션을 다시 뽑을 때 SessionView를 새로 마운트시키는 용도.
+  // 이게 없으면 큐만 바뀌고 진행 위치(index)가 남아 완료 화면에서 벗어나지 못한다.
+  const [sessionId, setSessionId] = useState(0)
 
   useEffect(() => {
     void purgeExpired()
@@ -79,6 +82,7 @@ export default function App() {
 
   const restartSession = useCallback(() => {
     setQueue(buildQueue(scenario, progressRef.current, Date.now()))
+    setSessionId((n) => n + 1)
   }, [])
 
   const activate = useCallback((turn: Turn) => {
@@ -143,6 +147,7 @@ export default function App() {
 
       {tab === 'session' ? (
         <SessionView
+          key={sessionId}
           scenario={scenario}
           queue={queue}
           appearances={appearances}
