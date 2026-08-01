@@ -39,6 +39,7 @@ const partnerTurn = (id = 1): Turn => ({
 
 const scenarioOf = (turns: Turn[]): Scenario => ({
   id: 'test-01',
+  week: 1,
   title: '테스트',
   level: 'A2',
   roles: { A: 'Partner', B: 'Learner' },
@@ -272,5 +273,148 @@ describe('levelFor', () => {
   it('저장된 단계를 상한에 맞춰 돌려준다', () => {
     const progress = progressOf({ 1: tp({ level: 'freestyle' }) })
     expect(levelFor(progress, 'test-01', partnerTurn(1))).toBe('blind')
+  })
+})
+
+
+// ---------- 주차와 진도율 ----------
+import {
+  turnScore,
+  weekProgress,
+  unlockedWeeks,
+  availableScenarios,
+  weekNumbers,
+  WEEK_UNLOCK_RATIO,
+} from './srs'
+
+const weekOf = (week: number, id: string, turns: Turn[]): Scenario => ({
+  ...scenarioOf(turns),
+  id,
+  week,
+})
+
+describe('turnScore', () => {
+  it('진행도가 없으면 0점', () => {
+    expect(turnScore({ version: 2, scenarios: {} }, 'test-01', userTurn(1))).toEqual({
+      score: 0,
+      max: 3,
+    })
+  })
+
+  it('상대역 문장은 만점이 2점이다 (blind가 상한)', () => {
+    expect(turnScore({ version: 2, scenarios: {} }, 'test-01', partnerTurn(1)).max).toBe(2)
+  })
+
+  it('한 칸 올라갈 때마다 1점', () => {
+    const at = (level: TurnProgress['level'], rating: TurnProgress['rating'] = 'ok') =>
+      turnScore(progressOf({ 1: tp({ level, rating }) }), 'test-01', userTurn(1)).score
+    expect(at('repeat')).toBe(0)
+    expect(at('blind')).toBe(1)
+    expect(at('freestyle')).toBe(2)
+  })
+
+  it('최고 단계에서 😀를 받으면 만점', () => {
+    const s = turnScore(
+      progressOf({ 1: tp({ level: 'freestyle', rating: 'good' }) }),
+      'test-01',
+      userTurn(1),
+    )
+    expect(s).toEqual({ score: 3, max: 3 })
+  })
+
+  it('상대역 문장은 blind에서 😀를 받으면 만점', () => {
+    const s = turnScore(
+      progressOf({ 1: tp({ level: 'blind', rating: 'good' }) }),
+      'test-01',
+      partnerTurn(1),
+    )
+    expect(s).toEqual({ score: 2, max: 2 })
+  })
+})
+
+describe('weekProgress', () => {
+  const w1 = weekOf(1, 'w1', [userTurn(1), userTurn(2)])
+  const w2 = weekOf(2, 'w2', [userTurn(1), userTurn(2)])
+  const empty: Progress = { version: 2, scenarios: {} }
+
+  it('주차 번호를 오름차순으로 뽑는다', () => {
+    expect(weekNumbers([w2, w1])).toEqual([1, 2])
+  })
+
+  it('아무것도 안 했으면 0%이고 첫 주차만 열려 있다', () => {
+    const [a, b] = weekProgress([w1, w2], empty)
+    expect(a.ratio).toBe(0)
+    expect(a.max).toBe(6)
+    expect(a.unlocked).toBe(true)
+    expect(b.unlocked).toBe(false)
+  })
+
+  it('단계별 통과 문장 수를 누적으로 센다', () => {
+    const progress: Progress = {
+      version: 2,
+      scenarios: { w1: { '1': tp({ level: 'freestyle' }), '2': tp({ level: 'blind' }) } },
+    }
+    const [a] = weekProgress([w1, w2], progress)
+    expect(a.bands).toEqual({ repeat: 2, blind: 1, freestyle: 0 })
+    // 누적 밴드를 더하면 획득 점수와 같아야 그대로 3색 막대가 된다
+    expect(a.bands.repeat + a.bands.blind + a.bands.freestyle).toBe(a.earned)
+    expect(a.earned).toBe(3)
+  })
+
+  it('앞 주차가 기준을 넘으면 다음 주차가 열린다', () => {
+    const progress: Progress = {
+      version: 2,
+      scenarios: {
+        w1: {
+          '1': tp({ level: 'freestyle', rating: 'good' }),
+          '2': tp({ level: 'freestyle', rating: 'good' }),
+        },
+      },
+    }
+    const [a, b] = weekProgress([w1, w2], progress)
+    expect(a.ratio).toBe(1)
+    expect(b.unlocked).toBe(true)
+  })
+
+  it('기준에 못 미치면 다음 주차가 잠겨 있다', () => {
+    const progress: Progress = {
+      version: 2,
+      scenarios: { w1: { '1': tp({ level: 'blind' }) } },
+    }
+    const [a, b] = weekProgress([w1, w2], progress)
+    expect(a.ratio).toBeLessThan(WEEK_UNLOCK_RATIO)
+    expect(b.unlocked).toBe(false)
+  })
+})
+
+describe('availableScenarios / 큐 잠금', () => {
+  const w1 = weekOf(1, 'w1', [userTurn(1), userTurn(2)])
+  const w2 = weekOf(2, 'w2', [userTurn(1), userTurn(2)])
+  const empty: Progress = { version: 2, scenarios: {} }
+
+  it('처음에는 1주차만 연습할 수 있다', () => {
+    expect(availableScenarios([w1, w2], empty).map((s) => s.id)).toEqual(['w1'])
+    expect([...unlockedWeeks([w1, w2], empty)]).toEqual([1])
+  })
+
+  it('잠긴 주차 문장은 오늘의 연습에 나오지 않는다', () => {
+    const queue = buildQueue(availableScenarios([w1, w2], empty), empty, NOW)
+    expect(queue.every((q) => q.scenario.week === 1)).toBe(true)
+  })
+
+  it('1주차를 채우면 2주차 문장도 큐에 들어온다', () => {
+    const progress: Progress = {
+      version: 2,
+      scenarios: {
+        w1: {
+          '1': tp({ level: 'freestyle', rating: 'good' }),
+          '2': tp({ level: 'freestyle', rating: 'good' }),
+        },
+      },
+    }
+    const open = availableScenarios([w1, w2], progress)
+    expect(open.map((s) => s.id)).toEqual(['w1', 'w2'])
+    const queue = buildQueue(open, progress, NOW)
+    expect(queue.some((q) => q.scenario.week === 2)).toBe(true)
   })
 })

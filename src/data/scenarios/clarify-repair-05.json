@@ -1,0 +1,187 @@
+{
+  "id": "clarify-repair-05",
+  "title": "못 알아들었을 때 되묻기",
+  "level": "A2",
+  "week": 2,
+  "roles": {
+    "A": "Staff",
+    "B": "You"
+  },
+  "userRole": "B",
+  "voices": {
+    "A": "en-us-lessac-medium",
+    "B": "en-us-ryan-high"
+  },
+  "turns": [
+    {
+      "id": 1,
+      "role": "A",
+      "text": "Your booking reference is B as in boy, four seven.",
+      "ko": "예약 번호는 B, boy의 B, 그리고 4 7입니다.",
+      "audio": { "normal": "01.mp3", "slow": "01_slow.mp3" },
+      "keywords": ["booking reference", "B as in boy"],
+      "tips": [
+        { "ref": "consonant-cluster", "target": "booking" },
+        { "ref": "er-sound", "target": "reference" },
+        { "ref": "ae-vs-e", "target": "as in" }
+      ],
+      "coach": "'B as in boy'는 전화나 시끄러운 곳에서 철자를 확인해주는 표준 방식입니다. 이 패턴이 나오면 앞 글자가 알파벳이라는 신호이니, 뒤 단어가 아니라 첫 글자만 받아적으면 됩니다."
+    },
+    {
+      "id": 2,
+      "role": "B",
+      "text": "Sorry, could you say that again?",
+      "ko": "죄송한데 다시 한 번 말씀해주시겠어요?",
+      "audio": { "normal": "02.mp3", "slow": "02_slow.mp3" },
+      "keywords": ["Sorry", "say that again"],
+      "intentKo": "못 알아들었으니 다시 말해달라고 정중히 부탁해라",
+      "alternatives": [
+        "Sorry, I didn't catch that.",
+        "Could you repeat that, please?",
+        "Sorry, one more time?"
+      ],
+      "tips": [
+        { "ref": "er-sound", "target": "Sorry" },
+        { "ref": "th-voiced", "target": "that" },
+        { "ref": "question-intonation", "target": "could you say that again?" }
+      ],
+      "coach": "가장 먼저 몸에 붙여야 할 문장입니다. 아무 말 없이 굳어 있으면 대화가 거기서 끝나지만, 이 한마디만 나오면 상대가 알아서 다시 말해줍니다. 'Sorry'를 앞에 붙이는 것만으로 충분히 정중합니다."
+    },
+    {
+      "id": 3,
+      "role": "A",
+      "text": "Of course. B as in boy, then four seven.",
+      "ko": "그럼요. boy의 B, 그리고 4 7입니다.",
+      "audio": { "normal": "03.mp3", "slow": "03_slow.mp3" },
+      "keywords": ["B as in boy", "four seven"],
+      "tips": [
+        { "ref": "f-v", "target": "Of" },
+        { "ref": "th-voiced", "target": "then" },
+        { "ref": "final-stop", "target": "boy, then four seven" }
+      ],
+      "coach": "되물으면 상대는 대개 더 천천히, 끊어서 다시 말해줍니다. 그러니 창피해할 이유가 전혀 없습니다 — 되묻는 쪽이 오히려 대화를 살립니다."
+    },
+    {
+      "id": 4,
+      "role": "B",
+      "text": "Sorry, the last part? I got the B.",
+      "ko": "죄송한데 뒷부분이요? B는 들었어요.",
+      "audio": { "normal": "04.mp3", "slow": "04_slow.mp3" },
+      "keywords": ["the last part", "I got the B"],
+      "intentKo": "앞부분은 알아들었고 뒷부분만 다시 말해달라고 해라",
+      "alternatives": [
+        "Sorry, just the last bit? I caught the B.",
+        "I got the B — what came after?",
+        "Sorry, after the B?"
+      ],
+      "tips": [
+        { "ref": "l-clear", "target": "last" },
+        { "ref": "flap-t", "target": "I got the" },
+        { "ref": "question-intonation", "target": "part?" }
+      ],
+      "coach": "전체를 다시 듣는 것보다 훨씬 효율적이고, 무엇보다 '나는 어디까지 들었다'를 알려주니 상대가 정확히 그 부분만 말해줍니다. 이게 초급과 중급을 가르는 기술입니다."
+    },
+    {
+      "id": 5,
+      "role": "A",
+      "text": "Four seven. So the whole thing is B four seven.",
+      "ko": "4 7이요. 그러니까 전체는 B47입니다.",
+      "audio": { "normal": "05.mp3", "slow": "05_slow.mp3" },
+      "keywords": ["Four seven", "the whole thing"],
+      "tips": [
+        { "ref": "th-voiceless", "target": "thing" },
+        { "ref": "l-clear", "target": "whole" },
+        { "ref": "sentence-stress", "target": "So the" }
+      ],
+      "coach": "'the whole thing'은 '전체'라는 뜻으로 구어에서 자주 씁니다. 상대가 이렇게 한 번 정리해주면 받아적기 딱 좋은 타이밍입니다."
+    },
+    {
+      "id": 6,
+      "role": "B",
+      "text": "Let me repeat that back. B, four, seven. Right?",
+      "ko": "제가 다시 확인할게요. B, 4, 7. 맞나요?",
+      "audio": { "normal": "06.mp3", "slow": "06_slow.mp3" },
+      "keywords": ["repeat that back", "Right?"],
+      "intentKo": "들은 내용을 그대로 되짚어 말하고 맞는지 확인해라",
+      "alternatives": [
+        "So that's B, four, seven — is that right?",
+        "Just to confirm: B, four, seven?",
+        "Let me read that back to you. B four seven?"
+      ],
+      "tips": [
+        { "ref": "word-stress", "target": "repeat" },
+        { "ref": "v-vs-b", "target": "seven" },
+        { "ref": "question-intonation", "target": "Right?" }
+      ],
+      "coach": "'repeat that back'은 숫자나 이름을 확인하는 최고의 방법입니다. 되묻는 게 아니라 확인이라서 상대도 부담이 없고, 틀렸으면 바로 잡아줍니다. 'repeat'은 뒤 음절에 강세가 옵니다."
+    },
+    {
+      "id": 7,
+      "role": "A",
+      "text": "That's right. And your slot is at half past two.",
+      "ko": "맞습니다. 그리고 예약 시간은 2시 30분입니다.",
+      "audio": { "normal": "07.mp3", "slow": "07_slow.mp3" },
+      "keywords": ["That's right", "half past two"],
+      "tips": [
+        { "ref": "ae-vs-e", "target": "half past" },
+        { "ref": "l-clear", "target": "slot" },
+        { "ref": "stress-timing", "target": "And your" }
+      ],
+      "coach": "'half past two'는 2시 30분입니다. 영국식 표현이지만 미국에서도 통하고, 숫자만 듣던 사람은 이 표현이 나오면 통째로 놓치기 쉬우니 꼭 기억해두세요."
+    },
+    {
+      "id": 8,
+      "role": "B",
+      "text": "Do you mean two thirty in the afternoon?",
+      "ko": "오후 2시 30분을 말씀하시는 거죠?",
+      "audio": { "normal": "08.mp3", "slow": "08_slow.mp3" },
+      "keywords": ["Do you mean", "two thirty"],
+      "intentKo": "'half past two'가 오후 2시 30분이 맞는지 풀어서 확인해라",
+      "alternatives": [
+        "So that's two thirty p.m.?",
+        "You mean two thirty in the afternoon, right?",
+        "Just to be sure — two thirty p.m.?"
+      ],
+      "tips": [
+        { "ref": "th-voiceless", "target": "thirty" },
+        { "ref": "f-v", "target": "afternoon" },
+        { "ref": "question-intonation", "target": "Do you mean two thirty in the afternoon?" }
+      ],
+      "coach": "'Do you mean ~?'는 들리긴 했는데 뜻이 헷갈릴 때 씁니다. 내가 이해한 대로 풀어서 되물으면 오해가 그 자리에서 잡힙니다. 다시 말해달라는 것과는 다른 도구입니다."
+    },
+    {
+      "id": 9,
+      "role": "A",
+      "text": "Yes, two thirty. Sorry, I should have said p.m.",
+      "ko": "네, 2시 30분이요. 죄송해요, 오후라고 했어야 했는데.",
+      "audio": { "normal": "09.mp3", "slow": "09_slow.mp3" },
+      "keywords": ["two thirty", "should have said"],
+      "tips": [
+        { "ref": "z-sound", "target": "Yes" },
+        { "ref": "reduction", "target": "should have said" },
+        { "ref": "th-voiceless", "target": "thirty" }
+      ],
+      "coach": "'should have said'는 [슈러v셋]처럼 완전히 뭉갭니다. 그리고 보세요 — 되물었더니 상대가 오히려 사과합니다. 되묻는 건 실례가 아니라 대화를 정확하게 만드는 일입니다."
+    },
+    {
+      "id": 10,
+      "role": "B",
+      "text": "No worries. Thanks for being patient with me.",
+      "ko": "괜찮습니다. 기다려주셔서 감사해요.",
+      "audio": { "normal": "10.mp3", "slow": "10_slow.mp3" },
+      "keywords": ["No worries", "being patient"],
+      "intentKo": "괜찮다고 하고 기다려준 것에 감사를 표해라",
+      "alternatives": [
+        "No problem at all. Thanks for your patience.",
+        "That's okay. I appreciate you repeating it.",
+        "No worries — thanks for bearing with me."
+      ],
+      "tips": [
+        { "ref": "er-sound", "target": "worries" },
+        { "ref": "th-voiceless", "target": "Thanks" },
+        { "ref": "sh-vs-s", "target": "patient" }
+      ],
+      "coach": "여러 번 되물었을 때 이 한마디로 마무리하면 관계가 깔끔해집니다. 'patient'는 [페이션트]로, ti가 /ʃ/ 소리라는 점에 주의하세요."
+    }
+  ]
+}

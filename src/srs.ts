@@ -233,3 +233,108 @@ export function levelFor(
   const tp = turnProgress(progress, scenarioId, turn.id)
   return tp ? clampLevel(tp.level, turn) : INITIAL_LEVEL
 }
+
+// ---------- 주차와 진도율 ----------
+
+/**
+ * 2주차가 열리는 1주차 진도율.
+ *
+ * 잠그는 이유는 순서를 지키게 하기 위해서다. 2주차(되묻기·문제 제기·화상회의)는
+ * 1주차의 기본 표현을 전제로 하므로, 기본기를 어느 정도 다진 뒤에 만나는 게 맞다.
+ * 다만 `전체 대화` 탭에서는 언제든 골라 연습할 수 있게 두어 답답하지 않게 한다.
+ */
+export const WEEK_UNLOCK_RATIO = 0.6
+
+/**
+ * 문장 하나의 진도 점수.
+ *
+ * 사다리를 한 칸 통과할 때마다 1점이다. 상대역 대사는 `키워드만 보고`가 상한이라
+ * 만점이 2점이고, 학습자 대사는 `자유롭게 말하기`까지 있어 3점이다.
+ * "한 번이라도 녹음했는가"가 아니라 "어디까지 올라왔는가"를 재는 것이 핵심이다.
+ */
+export function turnScore(
+  progress: Progress,
+  scenarioId: string,
+  turn: Turn,
+): { score: number; max: number } {
+  const cap = levelIndex(maxLevel(turn))
+  const max = cap + 1
+
+  const tp = turnProgress(progress, scenarioId, turn.id)
+  if (!tp) return { score: 0, max }
+
+  const reached = Math.min(levelIndex(tp.level), cap)
+  // 최고 단계에서 😀를 받으면 그 단계까지 통과한 것으로 본다.
+  const score = reached >= cap && tp.rating === 'good' ? max : reached
+  return { score, max }
+}
+
+export interface WeekProgress {
+  week: number
+  scenarios: Scenario[]
+  turnCount: number
+  /** 획득 점수 */
+  earned: number
+  /** 만점 */
+  max: number
+  /** 0~1 */
+  ratio: number
+  /**
+   * 단계별로 통과한 문장 수. 누적이라 repeat >= blind >= freestyle 이다.
+   * 세 값을 더하면 earned와 같아서, 그대로 3색 누적 막대가 된다.
+   */
+  bands: { repeat: number; blind: number; freestyle: number }
+  unlocked: boolean
+}
+
+/** 시나리오 목록에서 주차 번호를 오름차순으로 뽑는다. */
+export function weekNumbers(scenarios: Scenario[]): number[] {
+  return [...new Set(scenarios.map((s) => s.week))].sort((a, b) => a - b)
+}
+
+/**
+ * 주차별 진도. 앞 주차가 기준을 넘어야 다음 주차가 열린다.
+ * 첫 주차는 항상 열려 있다.
+ */
+export function weekProgress(scenarios: Scenario[], progress: Progress): WeekProgress[] {
+  const out: WeekProgress[] = []
+  let previousUnlocked = true
+
+  for (const week of weekNumbers(scenarios)) {
+    const inWeek = scenarios.filter((s) => s.week === week)
+    const bands = { repeat: 0, blind: 0, freestyle: 0 }
+    let earned = 0
+    let max = 0
+    let turnCount = 0
+
+    for (const scenario of inWeek) {
+      for (const turn of scenario.turns) {
+        const { score, max: turnMax } = turnScore(progress, scenario.id, turn)
+        earned += score
+        max += turnMax
+        turnCount++
+        if (score >= 1) bands.repeat++
+        if (score >= 2) bands.blind++
+        if (score >= 3) bands.freestyle++
+      }
+    }
+
+    const ratio = max > 0 ? earned / max : 0
+    out.push({ week, scenarios: inWeek, turnCount, earned, max, ratio, bands, unlocked: previousUnlocked })
+    // 이 주차를 충분히 했으면 다음 주차가 열린다.
+    previousUnlocked = previousUnlocked && ratio >= WEEK_UNLOCK_RATIO
+  }
+
+  return out
+}
+
+/** 지금 연습할 수 있는 주차 번호. */
+export function unlockedWeeks(scenarios: Scenario[], progress: Progress): Set<number> {
+  return new Set(weekProgress(scenarios, progress).filter((w) => w.unlocked).map((w) => w.week))
+}
+
+/** 오늘의 연습에 낼 수 있는 시나리오 — 잠긴 주차는 뺀다. */
+export function availableScenarios(scenarios: Scenario[], progress: Progress): Scenario[] {
+  const open = unlockedWeeks(scenarios, progress)
+  return scenarios.filter((s) => open.has(s.week))
+}

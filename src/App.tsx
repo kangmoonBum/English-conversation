@@ -8,9 +8,19 @@ import { Recorder } from './audio/recorder'
 import { loadProgress, getTurnProgress, recordAttempt, recordRating } from './store/progress'
 import { purgeExpired } from './store/recordings'
 import { firstAppearances } from './text'
-import { buildQueue, levelFor, pendingCount, type QueueItem, type ScheduleResult } from './srs'
+import {
+  availableScenarios,
+  buildQueue,
+  levelFor,
+  pendingCount,
+  turnScore,
+  weekProgress,
+  type QueueItem,
+  type ScheduleResult,
+} from './srs'
 import { TurnCard } from './components/TurnCard'
 import { SessionView } from './components/SessionView'
+import { WeekProgressBar } from './components/WeekProgressBar'
 
 const library = tipsJson as unknown as TipLibrary
 
@@ -57,7 +67,7 @@ export default function App() {
 
   // 세션 큐는 시작 시점에 고정한다 (SessionView 주석 참고).
   const [queue, setQueue] = useState<QueueItem[]>(() =>
-    buildQueue(SCENARIOS, initialProgress, Date.now()),
+    buildQueue(availableScenarios(SCENARIOS, initialProgress), initialProgress, Date.now()),
   )
   // 세션을 다시 뽑을 때 SessionView를 새로 마운트시키는 용도.
   // 이게 없으면 큐만 바뀌고 진행 위치(index)가 남아 완료 화면에서 벗어나지 못한다.
@@ -94,7 +104,8 @@ export default function App() {
   }, [])
 
   const restartSession = useCallback(() => {
-    setQueue(buildQueue(SCENARIOS, progressRef.current, Date.now()))
+    const p = progressRef.current
+    setQueue(buildQueue(availableScenarios(SCENARIOS, p), p, Date.now()))
     setSessionId((n) => n + 1)
   }, [])
 
@@ -112,11 +123,20 @@ export default function App() {
     setActive({ scenarioId: s.id, id: first.id, level: levelFor(progressRef.current, s.id, first) })
   }, [])
 
-  const pending = pendingCount(SCENARIOS, progress, Date.now())
+  const weeks = weekProgress(SCENARIOS, progress)
+  const pending = pendingCount(availableScenarios(SCENARIOS, progress), progress, Date.now())
 
-  /** 이 상황에서 한 번이라도 연습한 문장 수 */
-  const practicedIn = (s: Scenario) =>
-    s.turns.filter((t) => (getTurnProgress(progress, s.id, t.id)?.attempts ?? 0) > 0).length
+  /** 상황 하나의 진도율 (사다리 단계를 반영한 가중 점수) */
+  const scenarioRatio = (s: Scenario) => {
+    let earned = 0
+    let max = 0
+    for (const t of s.turns) {
+      const r = turnScore(progress, s.id, t)
+      earned += r.score
+      max += r.max
+    }
+    return max > 0 ? earned / max : 0
+  }
 
   const panelDeps = {
     library,
@@ -169,21 +189,24 @@ export default function App() {
       )}
 
       {tab === 'session' ? (
-        <SessionView
-          key={sessionId}
-          queue={queue}
-          appearancesFor={appearancesFor}
-          progressOf={(sid, turnId) => getTurnProgress(progress, sid, turnId)}
-          onRate={handleRate}
-          onAttempt={handleAttempt}
-          onRestart={restartSession}
-          {...panelDeps}
-        />
+        <>
+          <WeekProgressBar weeks={weeks} />
+          <SessionView
+            key={sessionId}
+            queue={queue}
+            appearancesFor={appearancesFor}
+            progressOf={(sid, turnId) => getTurnProgress(progress, sid, turnId)}
+            onRate={handleRate}
+            onAttempt={handleAttempt}
+            onRestart={restartSession}
+            {...panelDeps}
+          />
+        </>
       ) : (
         <>
           <div className="scenario-picker">
             {SCENARIOS.map((s) => {
-              const done = practicedIn(s)
+              const pct = Math.round(scenarioRatio(s) * 100)
               return (
                 <button
                   key={s.id}
@@ -193,7 +216,10 @@ export default function App() {
                 >
                   <span className="scenario-title">{s.title}</span>
                   <span className="scenario-meta">
-                    {s.level} · {done}/{s.turns.length}
+                    {s.week}주차 · {s.level} · {pct}%
+                  </span>
+                  <span className="scenario-bar">
+                    <span className="scenario-bar-fill" style={{ width: `${pct}%` }} />
                   </span>
                 </button>
               )

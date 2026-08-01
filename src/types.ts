@@ -70,6 +70,11 @@ export interface Turn {
 
 export interface Scenario {
   id: string
+  /**
+   * 학습 주차. 상황을 난이도·성격으로 묶어 순서를 정해준다.
+   * 1주차를 어느 정도 진행해야 2주차가 열린다 (srs.ts의 WEEK_UNLOCK_RATIO).
+   */
+  week: number
   title: string
   /** CEFR 레벨 표기. 예: "A2" */
   level: string

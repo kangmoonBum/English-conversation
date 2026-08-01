@@ -1,0 +1,187 @@
+{
+  "id": "video-call-07",
+  "title": "화상회의 기본",
+  "level": "B1",
+  "week": 2,
+  "roles": {
+    "A": "Colleague",
+    "B": "You"
+  },
+  "userRole": "B",
+  "voices": {
+    "A": "en-us-lessac-medium",
+    "B": "en-us-ryan-high"
+  },
+  "turns": [
+    {
+      "id": 1,
+      "role": "A",
+      "text": "Hey, can you hear me okay?",
+      "ko": "안녕하세요, 제 소리 잘 들리세요?",
+      "audio": { "normal": "01.mp3", "slow": "01_slow.mp3" },
+      "keywords": ["can you hear me okay"],
+      "tips": [
+        { "ref": "r-initial", "target": "hear" },
+        { "ref": "reduction", "target": "can you" },
+        { "ref": "question-intonation", "target": "can you hear me okay?" }
+      ],
+      "coach": "화상회의는 거의 항상 이 문장으로 시작합니다. 'can you'는 [커뉴]처럼 뭉치고, can은 거의 안 들릴 만큼 약해집니다."
+    },
+    {
+      "id": 2,
+      "role": "B",
+      "text": "Yes, loud and clear. Can you see my screen?",
+      "ko": "네, 잘 들려요. 제 화면 보이세요?",
+      "audio": { "normal": "02.mp3", "slow": "02_slow.mp3" },
+      "keywords": ["loud and clear", "see my screen"],
+      "intentKo": "잘 들린다고 답하고 내 화면이 보이는지 물어라",
+      "alternatives": [
+        "Yes, I can hear you fine. Can you see my screen?",
+        "Loud and clear. Is my screen showing?",
+        "Yep, all good. Are you seeing my screen?"
+      ],
+      "tips": [
+        { "ref": "l-clear", "target": "loud and clear" },
+        { "ref": "consonant-cluster", "target": "screen" },
+        { "ref": "question-intonation", "target": "Can you see my screen?" }
+      ],
+      "coach": "'Loud and clear'는 '아주 잘 들린다'는 관용구입니다. 'Yes'만 하는 것보다 훨씬 자연스럽고, 통화 품질까지 함께 알려주는 셈이라 회의에서 유용합니다."
+    },
+    {
+      "id": 3,
+      "role": "A",
+      "text": "Not yet. I think you're still on mute.",
+      "ko": "아직이요. 아직 음소거 되어 있는 것 같아요.",
+      "audio": { "normal": "03.mp3", "slow": "03_slow.mp3" },
+      "keywords": ["Not yet", "on mute"],
+      "tips": [
+        { "ref": "th-voiceless", "target": "think" },
+        { "ref": "short-u-vs-long-u", "target": "mute" },
+        { "ref": "flap-t", "target": "Not yet" }
+      ],
+      "coach": "'You're on mute'는 화상회의에서 가장 자주 듣는 말입니다. 이 한마디를 못 알아들으면 혼자 몇 분씩 말하게 되니 반드시 귀에 넣어두세요."
+    },
+    {
+      "id": 4,
+      "role": "B",
+      "text": "Oh, sorry about that. Let me share it again.",
+      "ko": "아, 죄송해요. 다시 공유할게요.",
+      "audio": { "normal": "04.mp3", "slow": "04_slow.mp3" },
+      "keywords": ["sorry about that", "share it again"],
+      "intentKo": "사과하고 화면을 다시 공유하겠다고 말해라",
+      "alternatives": [
+        "Oops, my bad. Let me share again.",
+        "Sorry — I'll try sharing it once more.",
+        "My apologies. Sharing it now."
+      ],
+      "tips": [
+        { "ref": "sh-vs-s", "target": "share" },
+        { "ref": "linking-cv", "target": "it again" },
+        { "ref": "er-sound", "target": "sorry" }
+      ],
+      "coach": "'Let me ~'는 회의에서 내가 뭔가 하겠다고 알릴 때 쓰는 기본 패턴입니다. 'share it again'은 [쉐어리러겐]처럼 완전히 이어집니다."
+    },
+    {
+      "id": 5,
+      "role": "A",
+      "text": "There it is. Sorry, you're breaking up a bit.",
+      "ko": "이제 보이네요. 죄송한데, 소리가 좀 끊겨요.",
+      "audio": { "normal": "05.mp3", "slow": "05_slow.mp3" },
+      "keywords": ["There it is", "breaking up"],
+      "tips": [
+        { "ref": "th-voiced", "target": "There" },
+        { "ref": "consonant-cluster", "target": "breaking" },
+        { "ref": "flap-t", "target": "a bit" }
+      ],
+      "coach": "'You're breaking up'은 연결이 끊긴다는 뜻입니다. 상대 잘못이 아니라 회선 문제를 말하는 것이라 사과할 필요는 없고, 카메라를 끄거나 자리를 옮기면 됩니다."
+    },
+    {
+      "id": 6,
+      "role": "B",
+      "text": "Let me turn off my camera. Is that better?",
+      "ko": "카메라를 끌게요. 좀 나아졌나요?",
+      "audio": { "normal": "06.mp3", "slow": "06_slow.mp3" },
+      "keywords": ["turn off my camera", "Is that better"],
+      "intentKo": "카메라를 끄겠다고 하고 나아졌는지 확인해라",
+      "alternatives": [
+        "I'll turn my video off. How's that?",
+        "Let me shut off the camera. Better now?",
+        "Turning my camera off — does that help?"
+      ],
+      "tips": [
+        { "ref": "er-sound", "target": "turn" },
+        { "ref": "f-v", "target": "off" },
+        { "ref": "flap-t", "target": "better" }
+      ],
+      "coach": "회선이 불안하면 카메라를 끄는 게 가장 빠른 해결책입니다. 'better'는 [베터]가 아니라 [베러] — 모음 사이 t가 'ㄹ'로 바뀝니다."
+    },
+    {
+      "id": 7,
+      "role": "A",
+      "text": "Much better, thanks. So, where were we?",
+      "ko": "훨씬 낫네요, 감사합니다. 그래서, 어디까지 얘기했죠?",
+      "audio": { "normal": "07.mp3", "slow": "07_slow.mp3" },
+      "keywords": ["Much better", "where were we"],
+      "tips": [
+        { "ref": "er-sound", "target": "were" },
+        { "ref": "th-voiceless", "target": "thanks" },
+        { "ref": "question-intonation", "target": "we?" }
+      ],
+      "coach": "'Where were we?'는 중단됐던 회의를 다시 시작할 때 쓰는 표현입니다. were는 거의 [워]로 뭉개져서 [웨어워위]처럼 들립니다."
+    },
+    {
+      "id": 8,
+      "role": "B",
+      "text": "Sorry, go ahead. I didn't mean to talk over you.",
+      "ko": "죄송해요, 먼저 말씀하세요. 말 끊을 생각은 아니었어요.",
+      "audio": { "normal": "08.mp3", "slow": "08_slow.mp3" },
+      "keywords": ["go ahead", "talk over you"],
+      "intentKo": "말이 겹쳤을 때 상대에게 먼저 말하라고 양보해라",
+      "alternatives": [
+        "Sorry, you go first.",
+        "Oh, after you — go ahead.",
+        "Sorry, I cut you off. Please continue."
+      ],
+      "tips": [
+        { "ref": "linking-cv", "target": "go ahead" },
+        { "ref": "th-voiceless", "target": "didn't" },
+        { "ref": "er-sound", "target": "over" }
+      ],
+      "coach": "화상회의는 지연 때문에 말이 겹치는 일이 잦습니다. **'Sorry, go ahead.' 이 다섯 글자를 반사적으로 낼 수 있어야** 회의가 매끄럽습니다. 'go ahead'는 [고어헤드]가 아니라 [고우어헫] 한 덩어리입니다."
+    },
+    {
+      "id": 9,
+      "role": "A",
+      "text": "No, please — you were saying something about the budget.",
+      "ko": "아니에요, 말씀하세요. 예산 얘기 하시던 중이었잖아요.",
+      "audio": { "normal": "09.mp3", "slow": "09_slow.mp3" },
+      "keywords": ["you were saying", "about the budget"],
+      "tips": [
+        { "ref": "flap-t", "target": "budget" },
+        { "ref": "th-voiceless", "target": "something" },
+        { "ref": "reduction", "target": "you were" }
+      ],
+      "coach": "'You were saying'은 상대가 하던 말을 이어가라고 권하는 표현입니다. 'budget'의 가운데 d는 [버짓]처럼 부드럽게 지나갑니다."
+    },
+    {
+      "id": 10,
+      "role": "B",
+      "text": "Right. Let me walk you through the numbers.",
+      "ko": "네. 숫자를 하나씩 설명드릴게요.",
+      "audio": { "normal": "10.mp3", "slow": "10_slow.mp3" },
+      "keywords": ["walk you through", "the numbers"],
+      "intentKo": "본론으로 돌아가 숫자를 차근차근 설명하겠다고 말해라",
+      "alternatives": [
+        "Okay. Let me take you through the numbers.",
+        "Sure. I'll go over the numbers with you.",
+        "Right — here's a quick rundown of the numbers."
+      ],
+      "tips": [
+        { "ref": "l-clear", "target": "walk" },
+        { "ref": "consonant-cluster", "target": "through" },
+        { "ref": "final-s", "target": "numbers" }
+      ],
+      "coach": "'walk you through ~'는 '차근차근 설명하다'는 뜻으로 업무 영어의 필수 표현입니다. 'explain'보다 훨씬 자연스럽고, 화면 공유하며 설명할 때 딱 맞습니다."
+    }
+  ]
+}
